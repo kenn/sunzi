@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+require File.expand_path('../../lib/sunzi',__FILE__)
+Sunzi::Cli.start
