@@ -11,7 +11,9 @@ else
     chmod 700 ~/.ssh
     chmod 600 ~/.ssh/authorized_keys
   else
-    echo 'The public key file ($1) not found! Copy it from $HOME/.ssh to the "there" directory.'
-    echo 'If the file name found in .ssh is different from $1, edit here/attributes.yml as appropriate.'
+    echo "The public key file is not found! Try the following command:"
+    echo "cp ~/.ssh/$1 ../remote"
+    echo "If the file name found in ~/.ssh is different from \"$1\", edit here/attributes.yml as appropriate."
+    exit 1
   fi
 fi

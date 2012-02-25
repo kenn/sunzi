@@ -26,17 +26,17 @@ Go to your project directory, then:
 
     $ sunzi create
 
-It generates a `sunzi` folder, subdirectories and some templates for you. Inside `sunzi`, there's `here` folder, which will be kept in your local machine, that contains some scripts and definition files. Also there's `there` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from the definition files in the `here` folder.
+It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `attributes.yml`, which defines dynamic attributes to be used from recipes. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `attributes.yml`.
 
-Go into the `here` directory, then run the `deploy.sh`:
+Go into the `sunzi` directory, then run the `sunzi deploy`:
 
-    $ cd sunzi/here
-    $ bash deploy.sh root@example.com
+    $ cd sunzi
+    $ sunzi deploy root@example.com
 
 Now, what it actually does is:
 
 1. SSH to `example.com` and login as `root`
-1. Transfer the content of the `there` directory to the remote server and extract in `$HOME/sunzi`
+1. Transfer the content of the `remote` directory to the remote server and extract in `$HOME/sunzi`
 1. Run `install.sh` in the remote server
 
 As you can see, what you need to do is edit `install.sh` and add some shell commands. That's it.
@@ -48,23 +48,22 @@ Here's the directory structure that `sunzi create` automatically generates:
 
 ```
 sunzi/
-  here/               ---- kept in your local machine
-    attributes.yml    ---- add custom variables here
-    compile.rb        ---- compile the content of attributes.yml to there/attributes/*
-    deploy.sh         ---- invoke this script
-  there/              ---- transferred to the remote server
-    attributes/       ---- compiled from attributes.yml at deploy
+  attributes.yml    ---- add custom variables here
+  remote/           ---- everything under this folder will be transferred to the remote server
+    attributes/     ---- compiled from attributes.yml at deploy
       env
       ssh_key
-    recipes/          ---- put commonly used scripts here, referred from install.sh
+    recipes/        ---- put commonly used scripts here, referred from install.sh
       ssh_key.sh
-    install.sh        ---- main scripts that gets run on the remote server
+    install.sh      ---- main scripts that gets run on the remote server
 ```
 
 Vagrant
 -------
 
-If you're using Sunzi with [Vagrant](http://vagrantup.com/), make sure you allowed SSH access for root, then:
+If you're using Sunzi with [Vagrant](http://vagrantup.com/), make sure you allowed SSH access for root.
+
+Since it uses port 2222 for SSH, you need to specify the port number:
 
     $ vagrant up
-    $ bash deploy.sh root@localhost -p 2222
+    $ sunzi deploy root@localhost 2222
