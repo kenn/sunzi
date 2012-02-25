@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ["kenn.ejima@gmail.com"]
   s.homepage    = "http://github.com/kenn/sunzi"
   s.summary     = %q{Server provisioning tool for minimalists}
-  s.description = %q{The supreme art of war is to subdue the enemy without fighting.}
+  s.description = %q{Server provisioning tool for minimalists}
 
   s.rubyforge_project = "sunzi"
 
