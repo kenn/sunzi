@@ -1,2 +1,2 @@
 --- # Remote recipes here will be loaded to individual files in remote/recipes.
-readme: http://gist.github.com/103208
+rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh

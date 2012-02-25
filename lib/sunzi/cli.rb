@@ -15,10 +15,10 @@ module Sunzi
       end
     end
 
-    map "c" => :create
-    map "d" => :deploy
+    # map "cr" => :create
+    # map "d" => :deploy
 
-    desc "create [PROJECT]", "Create sunzi project (Shortcut: c)"
+    desc "create [PROJECT]", "Create sunzi project"
     def create(project = 'sunzi')
       empty_directory project
       empty_directory "#{project}/remote"
@@ -29,32 +29,14 @@ module Sunzi
       template "templates/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
     end
 
-    desc "deploy [USER@HOST] [PORT]", "Deploy sunzi project (Shortcut: d)"
+    desc "deploy [USER@HOST] [PORT]", "Deploy sunzi project"
     def deploy(*target)
       if target.empty? or !target.first.match(/@/)
-        puts "Usage: sunzi deploy root@example.com"
+        say shell.set_color("Usage: sunzi deploy root@example.com", :red, true)
         abort
       end
 
-      # Check if you're in the sunzi directory
-      unless File.exists?('attributes.yml')
-        puts "You must be in the sunzi folder"
-        abort
-      end
-
-      # Compile attributes.yml
-      hash = YAML.load(File.read('attributes.yml'))
-      empty_directory 'remote/attributes'
-      hash.each do |key, value|
-        File.open("remote/attributes/#{key}", 'w'){|file| file.write(value) }
-      end
-
-      # Compile recipes.yml
-      hash = YAML.load(File.read('recipes.yml'))
-      empty_directory 'remote/recipes'
-      hash.each do |key, value|
-        get value, "remote/recipes/#{key}.sh"
-      end
+      compile
 
       host, port = target
       port ||= 22
@@ -85,5 +67,27 @@ module Sunzi
       end
     end
 
+    desc "compile", "Compile sunzi project"
+    def compile
+      # Check if you're in the sunzi directory
+      unless File.exists?('attributes.yml')
+        say shell.set_color("You must be in the sunzi folder", :red, true)
+        abort
+      end
+
+      # Compile attributes.yml
+      hash = YAML.load(File.read('attributes.yml'))
+      empty_directory 'remote/attributes'
+      hash.each do |key, value|
+        File.open("remote/attributes/#{key}", 'w'){|file| file.write(value) }
+      end
+
+      # Compile recipes.yml
+      hash = YAML.load(File.read('recipes.yml'))
+      empty_directory 'remote/recipes'
+      hash.each do |key, value|
+        get value, "remote/recipes/#{key}.sh"
+      end
+    end
   end
 end
