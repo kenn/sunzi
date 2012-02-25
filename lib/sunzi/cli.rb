@@ -15,7 +15,7 @@ module Sunzi
       end
     end
 
-    # map "cr" => :create
+    # map "c" => :create
     # map "d" => :deploy
 
     desc "create [PROJECT]", "Create sunzi project"
@@ -42,8 +42,11 @@ module Sunzi
       port ||= 22
       user, domain = host.split('@')
 
+      # The host key might change when we instantiate a new VM, so
+      # we remove (-R) the old host key from known_hosts.
+      `ssh-keygen -R #{domain} 2> /dev/null`
+
       commands = <<-EOS
-      ssh-keygen -R #{domain}
       cd remote
       tar cz . | ssh -o 'StrictHostKeyChecking no' #{host} -p #{port} '
       rm -rf ~/sunzi &&
@@ -57,11 +60,11 @@ module Sunzi
         stdin.close
         t = Thread.new(stderr) do |terr|
           while (line = terr.gets)
-            print "\e[31m#{line}\e[0m"
+            print shell.set_color(line, :red, true)
           end
         end
         while (line = stdout.gets)
-          print "\e[32m#{line}\e[0m"
+          print print shell.set_color(line, :green, true)
         end
         t.join
       end

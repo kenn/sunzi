@@ -5,16 +5,16 @@ Sunzi
 "The supreme art of war is to subdue the enemy without fighting." - Sunzi
 ```
 
-Sunzi is a server provisioning tool for minimalists. Simplicity is the one and only goal - if Chef or Puppet is driving you nuts, try Sunzi.
+Sunzi is the easiest server provisioning utility designed for mere mortals. If Chef or Puppet is driving you nuts, try Sunzi!
 
-Sunzi assumes that Linux distributions have (mostly) sane defaults.
+Sunzi assumes that modern Linux distributions have (mostly) sane defaults and great package managers.
 
 Its design goals are:
 
-* **Single shell script.** A big-bang overwriting with loads of custom configurations makes it difficult to know **what you are actually doing** - instead, Sunzi let you keep track of as little diff from default as possible.
-* **No mysterious Ruby DSL involved.** Sunzi recipes are written in a plain shell script. Why? Because, most of the information about server configuration you get on the web is written in a set of shell commands. Why should you translate it into a proprietary DSL, rather than just copy-paste?
-* **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
+* **It's just shell script.** No clunky Ruby DSL involved. Sunzi recipes are written in a plain shell script. Why? Because, most of the information about server configuration on the web is written in shell commands. Just copy-paste them, why should you translate it into a proprietary, inconvenience DSL? Also, shell script is the greatest common denominator on minimum Linux installs.
+* **Focus on diff from default.** No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations makes it difficult to understand what you are really doing.
 * **Always use the root user.** Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.
+* **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
 
 Quickstart
 ----------
