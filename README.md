@@ -32,7 +32,7 @@ It generates a `sunzi` folder along with subdirectories and templates. Inside `s
 Go into the `sunzi` directory, then run the `sunzi deploy`:
 
     $ cd sunzi
-    $ sunzi deploy root@example.com
+    $ sunzi deploy example.com
 
 Now, what it actually does is:
 
@@ -49,11 +49,9 @@ Here's the directory structure that `sunzi create` automatically generates:
 
 ```
 sunzi/
-  attributes.yml    ---- add custom attributes here
-  recipes.yml       ---- add remote recipes here
+  sunzi.yml         ---- add custom attributes and remote recipes here
   remote/           ---- everything under this folder will be transferred to the remote server
-    attributes/     ---- compiled attributes from attributes.yml at deploy (do not edit directly)
-      env
+    attributes/     ---- compiled attributes from sunzi.yml at deploy (do not edit directly)
       ssh_key
     recipes/        ---- put commonly used scripts here, referred from install.sh
       ssh_key.sh
@@ -112,7 +110,28 @@ rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
 Vagrant
 -------
 
-If you're using Sunzi with [Vagrant](http://vagrantup.com/), you need to specify the port number 2222.
+If you're using Sunzi with [Vagrant](http://vagrantup.com/), make sure that you have a root access via SSH.
 
-    $ vagrant up
-    $ sunzi deploy root@localhost 2222
+An easy way is to edit `Vagrantfile`:
+
+```ruby
+Vagrant::Config.run do |config|
+  config.vm.provision :shell do |shell|
+    shell.path = "chpasswd.sh"
+  end
+end
+```
+
+with `chpasswd.sh`:
+
+```
+#!/bin/bash
+
+sudo echo 'root:vagrant' | /usr/sbin/chpasswd
+```
+
+and now run `vagrant up`, it will change the root password to `vagrant`.
+
+Also keep in mind that you need to specify the port number 2222.
+
+    $ sunzi deploy localhost:2222

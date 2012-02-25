@@ -1,3 +1,0 @@
---- # Dynamic variables here will be compiled to individual files in remote/attributes.
-env: production
-ssh_key: id_rsa.pub
