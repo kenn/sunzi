@@ -24,6 +24,7 @@ module Sunzi
       empty_directory "#{project}/remote"
       empty_directory "#{project}/remote/recipes"
       template "templates/attributes.yml",            "#{project}/attributes.yml"
+      template "templates/recipes.yml",               "#{project}/recipes.yml"
       template "templates/remote/install.sh",         "#{project}/remote/install.sh"
       template "templates/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
     end
@@ -35,15 +36,24 @@ module Sunzi
         abort
       end
 
-      # Compile attributes.yml
+      # Check if you're in the sunzi directory
       unless File.exists?('attributes.yml')
         puts "You must be in the sunzi folder"
         abort
       end
+
+      # Compile attributes.yml
       hash = YAML.load(File.read('attributes.yml'))
-      FileUtils.mkdir_p('remote/attributes')
+      empty_directory 'remote/attributes'
       hash.each do |key, value|
         File.open("remote/attributes/#{key}", 'w'){|file| file.write(value) }
+      end
+
+      # Compile recipes.yml
+      hash = YAML.load(File.read('recipes.yml'))
+      empty_directory 'remote/recipes'
+      hash.each do |key, value|
+        get value, "remote/recipes/#{key}.sh"
       end
 
       host, port = target
