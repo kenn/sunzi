@@ -27,7 +27,7 @@ Go to your project directory, then:
 
     $ sunzi create
 
-It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `attributes.yml`, which defines dynamic attributes to be used from recipes. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `attributes.yml`.
+It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `sunzi.yml`, which defines dynamic attributes to be used from recipes. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `sunzi.yml`.
 
 Go into the `sunzi` directory, then run the `sunzi deploy`:
 
@@ -38,7 +38,7 @@ Now, what it actually does is:
 
 1. SSH to `example.com` and login as `root`
 1. Transfer the content of the `remote` directory to the remote server and extract in `$HOME/sunzi`
-1. Run `install.sh` in the remote server
+1. Run `install.sh` on the remote server
 
 As you can see, what you need to do is edit `install.sh` and add some shell commands. That's it.
 
@@ -61,13 +61,13 @@ sunzi/
 How do you pass dynamic values to a recipe?
 -------------------------------------------
 
-In the compile phase, `attributes.yml` are split into multiple files, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.
+In the compile phase, attributes defined in `sunzi.yml` are split into multiple files, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.
 
 The convention for argument passing to a recipe is to use `$1`, `$2`, etc. and put a comment line for each argument.
 
 For instance, given a recipe `greeting.sh`:
 
-```
+```bash
 # Greeting
 # $1: Name for goodbye
 # $2: Name for hello
@@ -97,12 +97,13 @@ Goodbye Chef, Hello Sunzi!
 Remote Recipes
 --------------
 
-Recipes can be retrieved remotely via HTTP. Put a URL in `recipes.yml`, and Sunzi automatically loads the content and put it into the `remote/recipes` folder.
+Recipes can be retrieved remotely via HTTP. Put a URL in the recipes section of `sunzi.yml`, and Sunzi will automatically load the content and put it into the `remote/recipes` folder in the compile phase.
 
-For instance, if you have the following line in `recipes.yml`,
+For instance, if you have the following line in `sunzi.yml`,
 
-```
-rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+```yaml
+recipes:
+  rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
 ```
 
 `rvm.sh` will be available and you can refer to that recipe by `source recipes/rvm.sh`.
@@ -124,7 +125,7 @@ end
 
 with `chpasswd.sh`:
 
-```
+```bash
 #!/bin/bash
 
 sudo echo 'root:vagrant' | /usr/sbin/chpasswd
