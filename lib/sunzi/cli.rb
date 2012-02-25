@@ -23,9 +23,9 @@ module Sunzi
       empty_directory project
       empty_directory "#{project}/remote"
       empty_directory "#{project}/remote/recipes"
-      template "templates/here/attributes.yml",       "#{project}/attributes.yml"
-      template "templates/remote/install.sh",          "#{project}/remote/install.sh"
-      template "templates/remote/recipes/ssh_key.sh",  "#{project}/remote/recipes/ssh_key.sh"
+      template "templates/attributes.yml",            "#{project}/attributes.yml"
+      template "templates/remote/install.sh",         "#{project}/remote/install.sh"
+      template "templates/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
     end
 
     desc "deploy [USER@HOST] [PORT]", "Deploy sunzi project (Shortcut: d)"
