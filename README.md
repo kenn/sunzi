@@ -77,14 +77,14 @@ echo "Goodbye $1, Hello $2!"
 
 With `attributes.yml`:
 
-```
+```yaml
 goodbye: Chef
 hello: Sunzi
 ```
 
 Then, include the recipe in `install.sh`:
 
-```
+```bash
 source recipes/greeting.sh $(cat attributes/goodbye) $(cat attributes/hello)
 ```
 
