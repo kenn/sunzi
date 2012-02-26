@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
+Signal.trap(:INT) { abort "\nAborting." }
 require File.expand_path('../../lib/sunzi',__FILE__)
 Sunzi::Cli.start

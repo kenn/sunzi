@@ -1,6 +1,3 @@
-require 'thor'
-require 'yaml'
-require 'fileutils'
 require 'open3'
 
 module Sunzi
@@ -23,9 +20,9 @@ module Sunzi
       empty_directory project
       empty_directory "#{project}/remote"
       empty_directory "#{project}/remote/recipes"
-      template "templates/sunzi.yml",                 "#{project}/sunzi.yml"
-      template "templates/remote/install.sh",         "#{project}/remote/install.sh"
-      template "templates/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
+      template "templates/create/sunzi.yml",                 "#{project}/sunzi.yml"
+      template "templates/create/remote/install.sh",         "#{project}/remote/install.sh"
+      template "templates/create/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
     end
 
     desc "deploy example.com (or user@example.com:2222)", "Deploy sunzi project"
@@ -85,6 +82,16 @@ module Sunzi
       hash['recipes'].each do |key, value|
         get value, "remote/recipes/#{key}.sh"
       end
+    end
+
+    desc "setup [linode|ec2]", "Setup a new VM"
+    def setup(target)
+      Cloud::Base.choose(target).setup
+    end
+
+    desc "teardown [linode|ec2] [name]", "Teardown an existing VM"
+    def teardown(target, name)
+      Cloud::Base.choose(target).teardown(name)
     end
 
     no_tasks do
