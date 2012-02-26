@@ -117,6 +117,10 @@ The following screenshot says it all.
 
 ![Sunzi for Linode](http://farm8.staticflickr.com/7210/6783789868_ab89010d5c.jpg)
 
+Right now, only [Linode](http://www.linode.com/) is supported, but EC2 and Rackspace are coming.
+
+For DNS, Linode and [Amazon Route 53](http://aws.amazon.com/route53/) are supported.
+
 Vagrant
 -------
 
