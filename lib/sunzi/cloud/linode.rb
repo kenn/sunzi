@@ -7,7 +7,9 @@ module Sunzi
   module Cloud
     class Linode < Base
       no_tasks do
+
         def setup
+          # Only run for the first time
           unless File.exist? 'linode/linode.yml'
             empty_directory 'linode'
             empty_directory 'linode/instances'
@@ -24,11 +26,7 @@ module Sunzi
           end
 
           # When route53 is specified for DNS, check if it's properly configured and if not, fail earlier.
-          if @config['dns'] == 'route53'
-            Sunzi::Dependency.load('route53')
-            route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
-            @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
-          end
+          setup_route53 if @config['dns'] == 'route53'
 
           @ui = HighLine.new
 
@@ -39,8 +37,8 @@ module Sunzi
           end
 
           # Ask environment and hostname
-          @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }
-          @host = ask('hostname? (only the last part of subdomain): ', String)
+          @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
+          @host = ask('hostname? (only the last part of subdomain): ', String).to_s
 
           @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
           @label = @config['label'][@env].gsub(/%{host}/, @host)
@@ -196,6 +194,53 @@ module Sunzi
             say shell.set_color("#{name}.yml was not found in the instances directory.", :red, true)
             abort
           end
+          @config = YAML.load(File.read('linode/linode.yml'))
+          setup_route53 if @config['dns'] == 'route53'
+
+          @instance = YAML.load(File.read("linode/instances/#{name}.yml"))
+          @api = ::Linode.new(:api_key => @config['api_key'])
+
+          # Shutdown first or disk deletion will fail
+          say shell.set_color("shutting down...", :green, true)
+          @api.linode.shutdown(:LinodeID => @instance[:linode_id])
+          sleep 10
+
+          # Delete the disks. It is required - http://www.linode.com/api/linode/linode%2Edelete
+          say shell.set_color("deleting root disk...", :green, true)
+          @api.linode.disk.delete(:LinodeID => @instance[:linode_id], :DiskID => @instance[:root_diskid]) rescue nil
+          say shell.set_color("deleting swap disk...", :green, true)
+          @api.linode.disk.delete(:LinodeID => @instance[:linode_id], :DiskID => @instance[:swap_diskid]) rescue nil
+          sleep 5
+
+          # Delete the instance
+          say shell.set_color("deleting linode...", :green, true)
+          @api.linode.delete(:LinodeID => @instance[:linode_id])
+
+          # Delete DNS record
+          case @config['dns']
+          when 'linode'
+            # Set the public IP to Linode DNS Manager
+            say "deleting the public IP to Linode DNS Manager..."
+            @domainid = @api.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
+            @resource = @api.domain.resource.list(:DomainID => @domainid).find{|i| i.target == @instance[:public_ip] }
+            @api.domain.resource.delete(:DomainID => @domainid, :ResourceID => @resource.resourceid)
+          when 'route53'
+            # Set the public IP to AWS Route 53
+            say "deleting the public IP to AWS Route 53..."
+            @record = @route53_zone.get_records.find{|i| i.values.first == @instance[:public_ip] }
+            @record.delete
+          end
+
+          # Remove the instance config file
+          remove_file "linode/instances/#{name}.yml"
+
+          say shell.set_color("Done.", :green, true)
+        end
+
+        def setup_route53
+          Sunzi::Dependency.load('route53')
+          route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
+          @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
         end
       end
     end

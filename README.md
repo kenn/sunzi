@@ -108,6 +108,15 @@ recipes:
 
 `rvm.sh` will be available and you can refer to that recipe by `source recipes/rvm.sh`.
 
+Cloud Support
+-------------
+
+You can setup a new VM / teardown an existing VM interactively. Use `sunzi setup` and `sunzi teardown` for that.
+
+The following screenshot says it all.
+
+![Sunzi for Linode](http://farm8.staticflickr.com/7210/6783789868_ab89010d5c.jpg)
+
 Vagrant
 -------
 
