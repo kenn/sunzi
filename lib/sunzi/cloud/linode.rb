@@ -8,13 +8,13 @@ module Sunzi
     class Linode < Base
       no_tasks do
         def setup
-          # unless File.exist? 'linode/linode.yml'
+          unless File.exist? 'linode/linode.yml'
             empty_directory 'linode'
             empty_directory 'linode/instances'
             template 'templates/setup/linode/linode.yml', 'linode/linode.yml'
             say shell.set_color('Now go ahead and edit linode.yml, then run this command again!', :green, true)
             abort
-          # end
+          end
 
           @config = YAML.load(File.read('linode/linode.yml'))
 
