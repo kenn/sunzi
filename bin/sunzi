@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+
+# Abort beautifully with ctrl+c.
 Signal.trap(:INT) { abort "\nAborting." }
+
+# Load the main lib and invoke CLI.
 require File.expand_path('../../lib/sunzi',__FILE__)
 Sunzi::Cli.start

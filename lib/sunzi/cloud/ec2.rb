@@ -1,14 +1,12 @@
 module Sunzi
   module Cloud
     class EC2 < Base
-      no_tasks do
-        def setup
-          say shell.set_color('EC2 is not implemented yet!', :red, true)
-        end
+      def setup
+        Logger.error 'EC2 is not implemented yet!'
+      end
 
-        def teardown(target)
-          say shell.set_color('EC2 is not implemented yet!', :red, true)
-        end
+      def teardown(target)
+        Logger.error 'EC2 is not implemented yet!'
       end
     end
   end

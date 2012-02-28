@@ -5,13 +5,13 @@ Sunzi
 "The supreme art of war is to subdue the enemy without fighting." - Sunzi
 ```
 
-Sunzi is the easiest server provisioning utility designed for mere mortals. If Chef or Puppet is driving you nuts, try Sunzi!
+Sunzi is the easiest [server provisioning](http://en.wikipedia.org/wiki/Provisioning#Server_provisioning) utility designed for mere mortals. If Chef or Puppet is driving you nuts, try Sunzi!
 
 Sunzi assumes that modern Linux distributions have (mostly) sane defaults and great package managers.
 
 Its design goals are:
 
-* **It's just shell script.** No clunky Ruby DSL involved. Sunzi recipes are written in a plain shell script. Why? Because, most of the information about server configuration on the web is written in shell commands. Just copy-paste them, why should you translate it into a proprietary, inconvenient DSL? Also, shell script is the greatest common denominator on minimum Linux installs.
+* **It's just shell script.** No clunky Ruby DSL involved. Sunzi recipes are written in a plain shell script. Most of the information about server configuration on the web is written in shell commands. Just copy-paste them, rather than translate it into an arbitrary DSL. Also, Bash is the greatest common denominator on minimum Linux installs.
 * **Focus on diff from default.** No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations make it difficult to understand what you are really doing.
 * **Always use the root user.** Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.
 * **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
@@ -21,26 +21,46 @@ Quickstart
 
 Install:
 
-    $ gem install sunzi
+```bash
+gem install sunzi
+```
 
 Go to your project directory, then:
 
-    $ sunzi create
+```bash
+sunzi create
+```
 
 It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `sunzi.yml`, which defines dynamic attributes to be used from recipes. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `sunzi.yml`.
 
-Go into the `sunzi` directory, then run the `sunzi deploy`:
+Go into the `sunzi` directory, then run `sunzi deploy`:
 
-    $ cd sunzi
-    $ sunzi deploy example.com
+```bash
+cd sunzi
+sunzi deploy example.com
+```
 
 Now, what it actually does is:
 
+1. Compile sunzi.yml to generate attributes and retrieve remote recipes
 1. SSH to `example.com` and login as `root`
 1. Transfer the content of the `remote` directory to the remote server and extract in `$HOME/sunzi`
 1. Run `install.sh` on the remote server
 
-As you can see, what you need to do is edit `install.sh` and add some shell commands. That's it.
+As you can see, all you need to do is edit `install.sh` and add some shell commands. That's it.
+
+A Sunzi project with no recipes is totally fine, so that you can start small, go big later.
+
+Commands
+--------
+
+```bash
+sunzi               # Show command help
+sunzi create        # Create a new Sunzi project
+sunzi deploy        # Deploy Sunzi project
+sunzi setup         # Setup a new VM on the Cloud services
+sunzi teardown      # Teardown an existing VM on the Cloud services
+```
 
 Directory structure
 -------------------
@@ -75,11 +95,12 @@ For instance, given a recipe `greeting.sh`:
 echo "Goodbye $1, Hello $2!"
 ```
 
-With `attributes.yml`:
+With `sunzi.yml`:
 
 ```yaml
-goodbye: Chef
-hello: Sunzi
+attributes:
+  goodbye: Chef
+  hello: Sunzi
 ```
 
 Then, include the recipe in `install.sh`:
@@ -111,7 +132,7 @@ recipes:
 Cloud Support
 -------------
 
-You can setup a new VM / teardown an existing VM interactively. Use `sunzi setup` and `sunzi teardown` for that.
+You can setup a new VM, or teardown an existing VM interactively. Use `sunzi setup` and `sunzi teardown` for that.
 
 The following screenshot says it all.
 
@@ -148,4 +169,6 @@ and now run `vagrant up`, it will change the root password to `vagrant`.
 
 Also keep in mind that you need to specify the port number 2222.
 
-    $ sunzi deploy localhost:2222
+```bash
+sunzi deploy localhost:2222
+```
