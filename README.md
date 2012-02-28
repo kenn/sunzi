@@ -11,7 +11,7 @@ Sunzi assumes that modern Linux distributions have (mostly) sane defaults and gr
 
 Its design goals are:
 
-* **It's just shell script.** No clunky Ruby DSL involved. Sunzi recipes are written in a plain shell script. Most of the information about server configuration on the web is written in shell commands. Just copy-paste them, rather than translate it into an arbitrary DSL. Also, Bash is the greatest common denominator on minimum Linux installs.
+* **It's just shell script.** No clunky Ruby DSL involved. Most of the information about server configuration on the web is written in shell commands. Just copy-paste them, rather than translate it into an arbitrary DSL. Also, Bash is the greatest common denominator on minimum Linux installs.
 * **Focus on diff from default.** No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations make it difficult to understand what you are really doing.
 * **Always use the root user.** Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.
 * **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
@@ -22,22 +22,22 @@ Quickstart
 Install:
 
 ```bash
-gem install sunzi
+$ gem install sunzi
 ```
 
 Go to your project directory, then:
 
 ```bash
-sunzi create
+$ sunzi create
 ```
 
-It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `sunzi.yml`, which defines dynamic attributes to be used from recipes. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `sunzi.yml`.
+It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `sunzi.yml`, which defines your own dynamic attributes to be used from scripts. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `sunzi.yml`.
 
 Go into the `sunzi` directory, then run `sunzi deploy`:
 
 ```bash
-cd sunzi
-sunzi deploy example.com
+$ cd sunzi
+$ sunzi deploy example.com
 ```
 
 Now, what it actually does is:
@@ -49,17 +49,17 @@ Now, what it actually does is:
 
 As you can see, all you need to do is edit `install.sh` and add some shell commands. That's it.
 
-A Sunzi project with no recipes is totally fine, so that you can start small, go big later.
+A Sunzi project with no recipes is totally fine, so that you can start small, go big as you get along.
 
 Commands
 --------
 
 ```bash
-sunzi               # Show command help
-sunzi create        # Create a new Sunzi project
-sunzi deploy        # Deploy Sunzi project
-sunzi setup         # Setup a new VM on the Cloud services
-sunzi teardown      # Teardown an existing VM on the Cloud services
+$ sunzi                               # Show command help
+$ sunzi create                        # Create a new Sunzi project
+$ sunzi deploy [user@host:port]       # Deploy Sunzi project
+$ sunzi setup [linode|ec2]            # Setup a new VM on the Cloud services
+$ sunzi teardown [linode|ec2] [name]  # Teardown an existing VM on the Cloud services
 ```
 
 Directory structure
@@ -170,5 +170,5 @@ and now run `vagrant up`, it will change the root password to `vagrant`.
 Also keep in mind that you need to specify the port number 2222.
 
 ```bash
-sunzi deploy localhost:2222
+$ sunzi deploy localhost:2222
 ```
