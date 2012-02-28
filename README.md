@@ -42,7 +42,7 @@ sunzi deploy example.com
 
 Now, what it actually does is:
 
-1. Compile sunzi.yml to generate attributes and retrieve remote recipes
+1. Compile `sunzi.yml` to generate attributes and retrieve remote recipes
 1. SSH to `example.com` and login as `root`
 1. Transfer the content of the `remote` directory to the remote server and extract in `$HOME/sunzi`
 1. Run `install.sh` on the remote server
