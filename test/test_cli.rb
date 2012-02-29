@@ -1,5 +1,5 @@
+require 'sunzi'
 require 'test/unit'
-require '../lib/sunzi'
 
 class TestCli < Test::Unit::TestCase
   def setup
