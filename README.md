@@ -56,6 +56,7 @@ Commands
 
 ```bash
 $ sunzi                               # Show command help
+$ sunzi compile                       # Compile Sunzi project
 $ sunzi create                        # Create a new Sunzi project
 $ sunzi deploy [user@host:port]       # Deploy Sunzi project
 $ sunzi setup [linode|ec2]            # Setup a new VM on the Cloud services
