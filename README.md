@@ -129,6 +129,8 @@ recipes:
 
 `rvm.sh` will be available and you can refer to that recipe by `source recipes/rvm.sh`.
 
+You may find sample recipes in this repository useful: https://github.com/kenn/sunzi-recipes
+
 Cloud Support
 -------------
 
