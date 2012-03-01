@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "thor"
   s.add_runtime_dependency "rainbow"
+  s.add_development_dependency "rake"
 end

@@ -4,5 +4,5 @@
 Signal.trap(:INT) { abort "\nAborting." }
 
 # Load the main lib and invoke CLI.
-require File.expand_path('../../lib/sunzi',__FILE__)
+require 'sunzi'
 Sunzi::Cli.start
