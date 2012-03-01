@@ -25,7 +25,7 @@ Install:
 $ gem install sunzi
 ```
 
-Go to your project directory, then:
+Go into your project directory (if it's a Rails project, `config` would be a good place to start with), then:
 
 ```bash
 $ sunzi create
