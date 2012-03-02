@@ -24,8 +24,6 @@ module Sunzi
         # When route53 is specified for DNS, check if it's properly configured and if not, fail earlier.
         setup_route53 if @config['dns'] == 'route53'
 
-        @ui = HighLine.new
-
         @sshkey = File.read(File.expand_path(@config['root_sshkey_path'])).chomp
         if @sshkey.match(/\n/)
           abort_with "RootSSHKey #{@sshkey.inspect} must not be multi-line! Check inside \"#{@config['root_sshkey_path']}\""
@@ -74,7 +72,7 @@ module Sunzi
         @swap_size = ask('swap size in MB? (default: 256MB): ', Integer) { |q| q.default = 256 }
 
         # Go ahead?
-        moveon = ask("Are you sure to go ahead and create #{@fqdn}? (y/n) ", String) {|q| q.in = ['y','n']}
+        moveon = ask("Are you ready to go ahead and create #{@fqdn}? (y/n) ", String) {|q| q.in = ['y','n']}
         exit unless moveon == 'y'
 
         # Create
@@ -88,16 +86,9 @@ module Sunzi
 
         # Update settings
         say "Updating settings..."
-        result = @api.linode.update(
-          :LinodeID => @linodeid,
-          :Label => @label,
-          :lpm_displayGroup => @group,
-          # :Alert_cpu_threshold => 90,
-          # :Alert_diskio_threshold => 1000,
-          # :Alert_bwin_threshold => 5,
-          # :Alert_bwout_threshold => 5,
-          # :Alert_bwquota_threshold => 80,
-        )
+        settings = { :LinodeID => @linodeid, :Label => @label, :lpm_displayGroup => @group }
+        settings.update(@config['settings']) if @config['settings']
+        result = @api.linode.update(settings)
 
         # Create a root disk
         say "Creating a root disk..."
@@ -192,23 +183,30 @@ module Sunzi
         setup_route53 if @config['dns'] == 'route53'
 
         @instance = YAML.load(File.read("linode/instances/#{name}.yml"))
+        @linode_id_hash = { :LinodeID => @instance[:linode_id] }
         @api = ::Linode.new(:api_key => @config['api_key'])
+
+        # Are you sure?
+        moveon = ask("Are you sure about deleting #{@instance[:fqdn]} permanently? (y/n) ", String) {|q| q.in = ['y','n']}
+        exit unless moveon == 'y'
 
         # Shutdown first or disk deletion will fail
         say 'shutting down...'
-        @api.linode.shutdown(:LinodeID => @instance[:linode_id])
-        sleep 10
+        @api.linode.shutdown(@linode_id_hash)
+        # Wait until linode.shutdown has completed
+        wait_for('linode.shutdown')
 
         # Delete the disks. It is required - http://www.linode.com/api/linode/linode%2Edelete
         say 'deleting root disk...'
-        @api.linode.disk.delete(:LinodeID => @instance[:linode_id], :DiskID => @instance[:root_diskid]) rescue nil
+        @api.linode.disk.delete(@linode_id_hash.merge(:DiskID => @instance[:root_diskid]))
         say 'deleting swap disk...'
-        @api.linode.disk.delete(:LinodeID => @instance[:linode_id], :DiskID => @instance[:swap_diskid]) rescue nil
-        sleep 5
+        @api.linode.disk.delete(@linode_id_hash.merge(:DiskID => @instance[:swap_diskid]))
+        # Wait until linode.disk.delete has completed
+        wait_for('fs.delete')
 
         # Delete the instance
         say 'deleting linode...'
-        @api.linode.delete(:LinodeID => @instance[:linode_id])
+        @api.linode.delete(@linode_id_hash)
 
         # Delete DNS record
         case @config['dns']
@@ -235,6 +233,12 @@ module Sunzi
         Sunzi::Dependency.load('route53')
         route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
         @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
+      end
+
+      def wait_for(action)
+        begin
+          sleep 3
+        end until @api.linode.job.list(@linode_id_hash).find{|i| i.action == action }.host_success == 1
       end
     end
   end

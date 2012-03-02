@@ -6,7 +6,7 @@ root_sshkey_path: ~/.ssh/id_rsa.pub
 # payment_term must be 1, 12 or 24
 payment_term: 1
 
-# Add / remove environments
+# add / remove environments
 environments:
   - production
   - staging
@@ -21,7 +21,7 @@ group:
   production: example
   staging: example-staging
 
-# Filter out large lists by keyword
+# filter out large lists by keyword
 distributions_filter: debian
 kernels_filter: latest
 
@@ -32,3 +32,11 @@ dns: linode
 route53:
   key: your_aws_key
   secret: your_aws_secret
+
+# other parameters for settings.
+# settings:
+#   alert_cpu_threshold: 90
+#   alert_diskio_threshold: 1000
+#   alert_bwin_threshold: 5
+#   alert_bwout_threshold: 5
+#   alert_bwquota_threshold: 80
