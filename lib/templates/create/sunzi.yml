@@ -1,7 +1,10 @@
 ---
 attributes:
-  # Dynamic variables here will be compiled to individual files in remote/attributes.
+  # Dynamic variables here will be compiled to individual files in compiled/attributes.
   ssh_key: id_rsa.pub
 recipes:
-  # Remote recipes here will be loaded to individual files in remote/recipes.
+  # Remote recipes here will be downloaded to compiled/recipes.
   rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+files:
+  # Files specified here will be copied to compiled/.
+  - ~/.ssh/id_rsa.pub

@@ -11,9 +11,7 @@ else
     chmod 700 ~/.ssh
     chmod 600 ~/.ssh/authorized_keys
   else
-    echo "The public key file is not found! Try the following command:"
-    echo "cp ~/.ssh/$1 remote"
-    echo "If the file name found in ~/.ssh is different from \"$1\", edit sunzi.yml as appropriate."
+    echo "The public key file \"$1\" is not found! Look into files section in sunzi.yml."
     exit 1
   fi
 fi

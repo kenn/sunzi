@@ -38,11 +38,12 @@ module Sunzi
 
       def do_create(project)
         empty_directory project
-        empty_directory "#{project}/remote"
-        empty_directory "#{project}/remote/recipes"
-        template "templates/create/sunzi.yml",                 "#{project}/sunzi.yml"
-        template "templates/create/remote/install.sh",         "#{project}/remote/install.sh"
-        template "templates/create/remote/recipes/ssh_key.sh", "#{project}/remote/recipes/ssh_key.sh"
+        empty_directory "#{project}/recipes"
+        empty_directory "#{project}/roles"
+        template "templates/create/.gitkeep",           "#{project}/roles/.gitkeep"
+        template "templates/create/sunzi.yml",          "#{project}/sunzi.yml"
+        template "templates/create/install.sh",         "#{project}/install.sh"
+        template "templates/create/recipes/ssh_key.sh", "#{project}/recipes/ssh_key.sh"
       end
 
       def do_deploy(target)
@@ -57,7 +58,7 @@ module Sunzi
         `ssh-keygen -R #{host} 2> /dev/null`
 
         commands = <<-EOS
-        cd remote
+        cd compiled
         tar cz . | ssh -o 'StrictHostKeyChecking no' #{endpoint} -p #{port} '
         rm -rf ~/sunzi &&
         mkdir ~/sunzi &&
@@ -88,17 +89,31 @@ module Sunzi
 
         # Load sunzi.yml
         hash = YAML.load(File.read('sunzi.yml'))
-        empty_directory 'remote/attributes'
-        empty_directory 'remote/recipes'
+        empty_directory 'compiled'
+        empty_directory 'compiled/attributes'
+        empty_directory 'compiled/recipes'
 
-        # Compile attributes.yml
+        # Break down attributes into individual files
         hash['attributes'].each do |key, value|
-          File.open("remote/attributes/#{key}", 'w'){|file| file.write(value) }
+          create_file "compiled/attributes/#{key}", value
         end
-        # Compile recipes.yml
+
+        # Retrieve remote recipes via HTTP
         hash['recipes'].each do |key, value|
-          get value, "remote/recipes/#{key}.sh"
+          get value, "compiled/recipes/#{key}.sh"
         end
+
+        # Copy local recipes
+        Dir['recipes/*'].each do |file|
+          copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}"
+        end
+
+        # Copy files
+        hash['files'].each do |file|
+          copy_file File.expand_path(file), "compiled/#{File.basename(file)}"
+        end
+
+        copy_file File.expand_path('install.sh'), 'compiled/install.sh'
       end
 
       def parse_target(target)
