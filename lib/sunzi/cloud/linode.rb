@@ -196,17 +196,9 @@ module Sunzi
         # Wait until linode.shutdown has completed
         wait_for('linode.shutdown')
 
-        # Delete the disks. It is required - http://www.linode.com/api/linode/linode%2Edelete
-        say 'deleting root disk...'
-        @api.linode.disk.delete(@linode_id_hash.merge(:DiskID => @instance[:root_diskid]))
-        say 'deleting swap disk...'
-        @api.linode.disk.delete(@linode_id_hash.merge(:DiskID => @instance[:swap_diskid]))
-        # Wait until linode.disk.delete has completed
-        wait_for('fs.delete')
-
         # Delete the instance
         say 'deleting linode...'
-        @api.linode.delete(@linode_id_hash)
+        @api.linode.delete(@linode_id_hash.merge(:skipChecks => 1))
 
         # Delete DNS record
         case @config['dns']
