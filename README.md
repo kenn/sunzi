@@ -35,7 +35,7 @@ Go into your project directory (if it's a Rails project, `config` would be a goo
 $ sunzi create
 ```
 
-It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there are `sunzi.yml` and `install.sh`. Those two are the most important files that you'll deal with.
+It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there are `sunzi.yml` and `install.sh`. Those two are the most important files that you mainly work on.
 
 Go into the `sunzi` directory, then run `sunzi deploy`:
 
@@ -72,20 +72,18 @@ Directory structure
 
 Here's the directory structure that `sunzi create` automatically generates:
 
-```
+```bash
 sunzi/
-  install.sh        ---- main script
-  sunzi.yml         ---- add custom attributes and remote recipes here
+  install.sh      # main script
+  sunzi.yml       # add custom attributes and remote recipes here
 
-  recipes/          ---- put commonly used scripts here, referred from install.sh
+  recipes/        # put commonly used scripts here, referred from install.sh
     ssh_key.sh
-
-  roles/            ---- when role is specified at deploy, scripts here will be concatenated to install.sh in the compile phase
+  roles/          # when role is specified, scripts here will be concatenated to install.sh in the compile phase
     app.sh
     db.sh
     web.sh
-
-  compiled/         ---- everything under this folder will be transferred to the remote server (do not edit directly)
+  compiled/       # everything under this folder will be transferred to the remote server (do not edit directly)
 ```
 
 How do you pass dynamic values to a recipe?
@@ -148,9 +146,9 @@ You probably have different configurations between **web servers** and **databas
 
 No problem - how Sunzi handles role-based configuration is refreshingly simple.
 
-A shell script under the `roles` directory will be automatically recognized as a role, such as `web.sh` or `db.sh`. The role script will be appended to `install.sh`, so you should put common procedures in `install.sh` and role specific procedures in the role script.
+Shell scripts under the `roles` directory, such as `web.sh` or `db.sh`, are automatically recognized as a role. The role script will be appended to `install.sh` at deploy, so you should put common configurations in `install.sh` and role specific procedures in the role script.
 
-For instance, when you set up a new web server, run the following script:
+For instance, when you set up a new web server, deploy with a role name:
 
 ```bash
 sunzi deploy example.com web
