@@ -16,6 +16,10 @@ Its design goals are:
 * **Always use the root user.** Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.
 * **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
 
+### What's new:
+
+* v0.5: Role-based configuration supported. Reworked directory structure. (Incompatible with previous versions)
+
 Quickstart
 ----------
 
@@ -31,7 +35,7 @@ Go into your project directory (if it's a Rails project, `config` would be a goo
 $ sunzi create
 ```
 
-It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there's `sunzi.yml`, which defines your own dynamic attributes to be used from scripts. Also there's the `remote` folder, which will be transferred to the remote server, that contains recipes and dynamic variables compiled from `sunzi.yml`.
+It generates a `sunzi` folder along with subdirectories and templates. Inside `sunzi`, there are `sunzi.yml` and `install.sh`. Those two are the most important files that you'll deal with.
 
 Go into the `sunzi` directory, then run `sunzi deploy`:
 
@@ -42,25 +46,25 @@ $ sunzi deploy example.com
 
 Now, what it actually does is:
 
-1. Compile `sunzi.yml` to generate attributes and retrieve remote recipes
+1. Compile `sunzi.yml` to generate attributes and retrieve remote recipes, then copy files into the `compiled` directory
 1. SSH to `example.com` and login as `root`
-1. Transfer the content of the `remote` directory to the remote server and extract in `$HOME/sunzi`
+1. Transfer the content of the `compiled` directory to the remote server and extract in `$HOME/sunzi`
 1. Run `install.sh` on the remote server
 
 As you can see, all you need to do is edit `install.sh` and add some shell commands. That's it.
 
-A Sunzi project with no recipes is totally fine, so that you can start small, go big as you get along.
+A Sunzi project without any recipes or roles is totally fine, so that you can start small, go big as you get along.
 
 Commands
 --------
 
 ```bash
-$ sunzi                               # Show command help
-$ sunzi compile                       # Compile Sunzi project
-$ sunzi create                        # Create a new Sunzi project
-$ sunzi deploy [user@host:port]       # Deploy Sunzi project
-$ sunzi setup [linode|ec2]            # Setup a new VM on the Cloud services
-$ sunzi teardown [linode|ec2] [name]  # Teardown an existing VM on the Cloud services
+$ sunzi                                 # Show command help
+$ sunzi compile                         # Compile Sunzi project
+$ sunzi create                          # Create a new Sunzi project
+$ sunzi deploy [user@host:port] [role]  # Deploy Sunzi project
+$ sunzi setup [linode|ec2]              # Setup a new VM on the Cloud services
+$ sunzi teardown [linode|ec2] [name]    # Teardown an existing VM on the Cloud services
 ```
 
 Directory structure
@@ -70,19 +74,24 @@ Here's the directory structure that `sunzi create` automatically generates:
 
 ```
 sunzi/
+  install.sh        ---- main script
   sunzi.yml         ---- add custom attributes and remote recipes here
-  remote/           ---- everything under this folder will be transferred to the remote server
-    attributes/     ---- compiled attributes from sunzi.yml at deploy (do not edit directly)
-      ssh_key
-    recipes/        ---- put commonly used scripts here, referred from install.sh
-      ssh_key.sh
-    install.sh      ---- main scripts that gets run on the remote server
+
+  recipes/          ---- put commonly used scripts here, referred from install.sh
+    ssh_key.sh
+
+  roles/            ---- when role is specified at deploy, scripts here will be concatenated to install.sh in the compile phase
+    app.sh
+    db.sh
+    web.sh
+
+  compiled/         ---- everything under this folder will be transferred to the remote server (do not edit directly)
 ```
 
 How do you pass dynamic values to a recipe?
 -------------------------------------------
 
-In the compile phase, attributes defined in `sunzi.yml` are split into multiple files, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.
+In the compile phase, attributes defined in `sunzi.yml` are split into multiple files in `compiled/attributes`, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.
 
 The convention for argument passing to a recipe is to use `$1`, `$2`, etc. and put a comment line for each argument.
 
@@ -119,7 +128,7 @@ Goodbye Chef, Hello Sunzi!
 Remote Recipes
 --------------
 
-Recipes can be retrieved remotely via HTTP. Put a URL in the recipes section of `sunzi.yml`, and Sunzi will automatically load the content and put it into the `remote/recipes` folder in the compile phase.
+Recipes can be retrieved remotely via HTTP. Put a URL in the recipes section of `sunzi.yml`, and Sunzi will automatically load the content and put it into the `compiled/recipes` folder in the compile phase.
 
 For instance, if you have the following line in `sunzi.yml`,
 
@@ -131,6 +140,23 @@ recipes:
 `rvm.sh` will be available and you can refer to that recipe by `source recipes/rvm.sh`.
 
 You may find sample recipes in this repository useful: https://github.com/kenn/sunzi-recipes
+
+Role-based configuration
+------------------------
+
+You probably have different configurations between **web servers** and **database servers**.
+
+No problem - how Sunzi handles role-based configuration is refreshingly simple.
+
+A shell script under the `roles` directory will be automatically recognized as a role, such as `web.sh` or `db.sh`. The role script will be appended to `install.sh`, so you should put common procedures in `install.sh` and role specific procedures in the role script.
+
+For instance, when you set up a new web server, run the following script:
+
+```bash
+sunzi deploy example.com web
+```
+
+It is equivalent to running `install.sh`, followed by `web.sh`.
 
 Cloud Support
 -------------
