@@ -1,10 +1,19 @@
 ---
+# Dynamic variables here will be compiled to individual files in compiled/attributes.
 attributes:
-  # Dynamic variables here will be compiled to individual files in compiled/attributes.
   ssh_key: id_rsa.pub
+  environment: development
+  ruby_version: 1.9.3
+
+# Remote recipes here will be downloaded to compiled/recipes.
 recipes:
-  # Remote recipes here will be downloaded to compiled/recipes.
   rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+  dotdeb: https://raw.github.com/kenn/sunzi-recipes/master/debian/dotdeb.sh
+  # nginx: https://raw.github.com/kenn/sunzi-recipes/master/debian/nginx.sh
+  # mongodb-10gen: https://raw.github.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
+  # mysql-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/mysql-server.sh
+  # redis-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/redis-server.sh
+
+# Files specified here will be copied to compiled/.
 files:
-  # Files specified here will be copied to compiled/.
   - ~/.ssh/id_rsa.pub

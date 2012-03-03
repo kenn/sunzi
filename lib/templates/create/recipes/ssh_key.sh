@@ -4,10 +4,10 @@
 if [ -f ~/.ssh/authorized_keys ]; then
   echo 'authorized_keys already created'
 else
-  if [ -f "$1" ]; then
+  if [ -f "files/$1" ]; then
     mkdir -p ~/.ssh
-    cat $1 > ~/.ssh/authorized_keys
-    rm $1
+    cat "files/$1" > ~/.ssh/authorized_keys
+    rm "files/$1"
     chmod 700 ~/.ssh
     chmod 600 ~/.ssh/authorized_keys
   else
