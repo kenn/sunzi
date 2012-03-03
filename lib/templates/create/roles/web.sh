@@ -1,4 +1,4 @@
 # Install Web server
 
-# Install Nginx
-source recipes/nginx.sh
+source recipes/nginx.sh       # Nginx
+# source recipes/apache2.sh   # Apache

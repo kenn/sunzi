@@ -10,6 +10,7 @@ recipes:
   rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
   dotdeb: https://raw.github.com/kenn/sunzi-recipes/master/debian/dotdeb.sh
   # nginx: https://raw.github.com/kenn/sunzi-recipes/master/debian/nginx.sh
+  # apache2: https://raw.github.com/kenn/sunzi-recipes/master/debian/apache2.sh
   # mongodb-10gen: https://raw.github.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
   # mysql-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/mysql-server.sh
   # redis-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/redis-server.sh

@@ -15,8 +15,8 @@ module Sunzi
     end
 
     desc "compile", "Compile sunzi project"
-    def compile
-      do_compile
+    def compile(role = nil)
+      do_compile(role)
     end
 
     desc "setup [linode|ec2]", "Setup a new VM"
@@ -40,7 +40,7 @@ module Sunzi
         empty_directory project
         empty_directory "#{project}/recipes"
         empty_directory "#{project}/roles"
-        template "templates/create/.gitignore",         "#{project}/.gitignore"
+        # template "templates/create/.gitignore",         "#{project}/.gitignore"
         template "templates/create/sunzi.yml",          "#{project}/sunzi.yml"
         template "templates/create/install.sh",         "#{project}/install.sh"
         template "templates/create/recipes/ssh_key.sh", "#{project}/recipes/ssh_key.sh"
@@ -53,11 +53,8 @@ module Sunzi
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
-        # Check if role exists
-        abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
-
         # compile attributes and recipes
-        compile
+        compile(role)
 
         # The host key might change when we instantiate a new VM, so
         # we remove (-R) the old host key from known_hosts.
@@ -68,11 +65,8 @@ module Sunzi
         mkdir ~/sunzi &&
         cd ~/sunzi &&
         tar xz &&
-        bash install.sh &&
+        bash install.sh
         EOS
-
-        # Append role-based scripts
-        remote_commands << (role ? "bash roles/#{role}.sh" : 'echo "no role specified"')
 
         local_commands = <<-EOS
         cd compiled
@@ -93,9 +87,11 @@ module Sunzi
         end
       end
 
-      def do_compile
+      def do_compile(role)
         # Check if you're in the sunzi directory
         abort_with "You must be in the sunzi folder" unless File.exists?('sunzi.yml')
+        # Check if role exists
+        abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
 
         # Load sunzi.yml
         hash = YAML.load(File.read('sunzi.yml'))
@@ -105,31 +101,22 @@ module Sunzi
         empty_directory 'compiled/files'
 
         # Break down attributes into individual files
-        hash['attributes'].each do |key, value|
-          create_file "compiled/attributes/#{key}", value
-        end
+        hash['attributes'].each {|key, value| create_file "compiled/attributes/#{key}", value }
 
         # Retrieve remote recipes via HTTP
-        hash['recipes'].each do |key, value|
-          get value, "compiled/recipes/#{key}.sh"
-        end
+        hash['recipes'].each {|key, value| get value, "compiled/recipes/#{key}.sh" }
 
-        # Copy local recipes
-        Dir['recipes/*'].each do |file|
-          copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}"
-        end
+        # Copy local files
+        Dir['recipes/*'].each {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
+        Dir['roles/*'].each   {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
+        hash['files'].each    {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
-        # Copy roles
-        Dir['roles/*'].each do |file|
-          copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}"
+        # Build install.sh
+        if role
+          create_file 'compiled/install.sh', File.binread("install.sh") << "\n" << File.binread("roles/#{role}.sh")
+        else
+          copy_file File.expand_path('install.sh'), 'compiled/install.sh'
         end
-
-        # Copy files
-        hash['files'].each do |file|
-          copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}"
-        end
-
-        copy_file File.expand_path('install.sh'), 'compiled/install.sh'
       end
 
       def parse_target(target)
