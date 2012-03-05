@@ -37,10 +37,7 @@ module Sunzi
       end
 
       def do_create(project)
-        empty_directory project
-        empty_directory "#{project}/recipes"
-        empty_directory "#{project}/roles"
-        # template "templates/create/.gitignore",         "#{project}/.gitignore"
+        template "templates/create/.gitignore",         "#{project}/.gitignore"
         template "templates/create/sunzi.yml",          "#{project}/sunzi.yml"
         template "templates/create/install.sh",         "#{project}/install.sh"
         template "templates/create/recipes/ssh_key.sh", "#{project}/recipes/ssh_key.sh"
@@ -77,11 +74,11 @@ module Sunzi
           stdin.close
           t = Thread.new do
             while (line = stderr.gets)
-              print line.color(:red).bright
+              print line.color(:red)
             end
           end
           while (line = stdout.gets)
-            print line.color(:green).bright
+            print line.color(:green)
           end
           t.join
         end
@@ -95,10 +92,6 @@ module Sunzi
 
         # Load sunzi.yml
         hash = YAML.load(File.read('sunzi.yml'))
-        empty_directory 'compiled'
-        empty_directory 'compiled/attributes'
-        empty_directory 'compiled/recipes'
-        empty_directory 'compiled/files'
 
         # Break down attributes into individual files
         hash['attributes'].each {|key, value| create_file "compiled/attributes/#{key}", value }

@@ -15,6 +15,6 @@ recipes:
   # mysql-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/mysql-server.sh
   # redis-server: https://raw.github.com/kenn/sunzi-recipes/master/debian/redis-server.sh
 
-# Files specified here will be copied to compiled/.
+# Files specified here will be copied to compiled/files.
 files:
   - ~/.ssh/id_rsa.pub

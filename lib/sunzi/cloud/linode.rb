@@ -9,7 +9,6 @@ module Sunzi
       def setup
         # Only run for the first time
         unless File.exist? 'linode/linode.yml'
-          @cli.empty_directory 'linode'
           @cli.empty_directory 'linode/instances'
           @cli.template 'templates/setup/linode/linode.yml', 'linode/linode.yml'
           exit_with 'Now go ahead and edit linode.yml, then run this command again!'
@@ -143,10 +142,7 @@ module Sunzi
           Route53::DNSRecord.new(@fqdn, "A", "300", [@public_ip], @route53_zone).create
         end
 
-        # Boot
-        say 'Done. Booting...'
-        @api.linode.boot(:LinodeID => @linodeid)
-
+        # Save the instance info
         hash = {
           :linode_id => @linodeid,
           :env => @env,
@@ -169,10 +165,11 @@ module Sunzi
           :public_ip => @public_ip,
           :private_ip => @private_ip,
         }
+        @cli.create_file "linode/instances/#{@label}.yml", YAML.dump(hash)
 
-        File.open("linode/instances/#{@label}.yml",'w') do |file|
-          file.write YAML.dump(hash)
-        end
+        # Boot
+        say 'Done. Booting...'
+        @api.linode.boot(:LinodeID => @linodeid)
       end
 
       def teardown(name)
