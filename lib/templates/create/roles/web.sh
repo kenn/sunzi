@@ -1,4 +1,4 @@
 # Install Web server
 
-source recipes/nginx.sh       # Nginx
-# source recipes/apache2.sh   # Apache
+aptitude -y install nginx       # Nginx
+# aptitude -y install apache2   # Apache

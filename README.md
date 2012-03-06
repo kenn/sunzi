@@ -18,7 +18,8 @@ Its design goals are:
 
 ### What's new:
 
-* v0.5: Role-based configuration supported. Reworked directory structure. (Incompatible with previous versions)
+* v0.6: System function sunzi::silencer() added for succinct log messages.
+* v0.5: Role-based configuration supported. Reworked directory structure. **Incompatible with previous versions**.
 
 Quickstart
 ----------

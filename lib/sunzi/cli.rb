@@ -40,6 +40,7 @@ module Sunzi
         template "templates/create/.gitignore",         "#{project}/.gitignore"
         template "templates/create/sunzi.yml",          "#{project}/sunzi.yml"
         template "templates/create/install.sh",         "#{project}/install.sh"
+        template "templates/create/recipes/sunzi.sh",   "#{project}/recipes/sunzi.sh"
         template "templates/create/recipes/ssh_key.sh", "#{project}/recipes/ssh_key.sh"
         template "templates/create/roles/app.sh",       "#{project}/roles/app.sh"
         template "templates/create/roles/db.sh",        "#{project}/roles/db.sh"

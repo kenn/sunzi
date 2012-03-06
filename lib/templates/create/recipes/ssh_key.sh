@@ -5,6 +5,7 @@ if [ -f ~/.ssh/authorized_keys ]; then
   echo 'authorized_keys already created'
 else
   if [ -f "files/$1" ]; then
+    echo 'Creating authorized_keys'
     mkdir -p ~/.ssh
     cat "files/$1" > ~/.ssh/authorized_keys
     rm "files/$1"
