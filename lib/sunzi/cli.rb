@@ -95,15 +95,15 @@ module Sunzi
         hash = YAML.load(File.read('sunzi.yml'))
 
         # Break down attributes into individual files
-        hash['attributes'].each {|key, value| create_file "compiled/attributes/#{key}", value }
+        hash['attributes'].each {|key, value| create_file "compiled/attributes/#{key}", value} if hash['attributes']
 
         # Retrieve remote recipes via HTTP
-        hash['recipes'].each {|key, value| get value, "compiled/recipes/#{key}.sh" }
+        hash['recipes'].each {|key, value| get value, "compiled/recipes/#{key}.sh"} if hash['recipes']
 
         # Copy local files
-        Dir['recipes/*'].each {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
-        Dir['roles/*'].each   {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
-        hash['files'].each    {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        Dir['recipes/*'].each {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}"}
+        Dir['roles/*'].each {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}"}
+        hash['files'].each {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}"} if hash['files']
 
         # Build install.sh
         if role
