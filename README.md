@@ -18,6 +18,7 @@ Its design goals are:
 
 ### What's new:
 
+* v0.7: Added `erase_remote_folder` and `cache_remote_recipes` preferences for customized behavior.
 * v0.6: System function sunzi::silencer() added for succinct log messages.
 * v0.5: Role-based configuration supported. Reworked directory structure. **Incompatible with previous versions**.
 

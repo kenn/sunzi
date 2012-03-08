@@ -14,3 +14,13 @@ recipes:
 # Files specified here will be copied to compiled/files.
 files:
   - ~/.ssh/id_rsa.pub
+
+# Fine tune how Sunzi should work.
+preferences:
+  # Erase the generated folder on the server after deploy.
+  # Turn on when you are done with testing and ready for production use.
+  erase_remote_folder: false
+
+  # Skip retrieving remote recipes when local copies already exist. This setting helps
+  # iterative deploy testing considerably faster, when you have a lot of remote recipes.
+  cache_remote_recipes: false

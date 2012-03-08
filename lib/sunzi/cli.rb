@@ -52,7 +52,7 @@ module Sunzi
         endpoint = "#{user}@#{host}"
 
         # compile attributes and recipes
-        compile(role)
+        do_compile(role)
 
         # The host key might change when we instantiate a new VM, so
         # we remove (-R) the old host key from known_hosts.
@@ -65,6 +65,8 @@ module Sunzi
         tar xz &&
         bash install.sh
         EOS
+
+        remote_commands.strip! << ' && rm -rf ~/sunzi' if @config['preferences'] and @config['preferences']['erase_remote_folder']
 
         local_commands = <<-EOS
         cd compiled
@@ -92,18 +94,22 @@ module Sunzi
         abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
 
         # Load sunzi.yml
-        hash = YAML.load(File.read('sunzi.yml'))
+        @config = YAML.load(File.read('sunzi.yml'))
 
         # Break down attributes into individual files
-        hash['attributes'].each {|key, value| create_file "compiled/attributes/#{key}", value }
+        (@config['attributes'] || []).each {|key, value| create_file "compiled/attributes/#{key}", value }
 
         # Retrieve remote recipes via HTTP
-        hash['recipes'].each {|key, value| get value, "compiled/recipes/#{key}.sh" }
+        cache_remote_recipes = @config['preferences'] && @config['preferences']['cache_remote_recipes']
+        (@config['recipes'] || []).each do |key, value|
+          next if cache_remote_recipes and File.exists?("compiled/recipes/#{key}.sh")
+          get value, "compiled/recipes/#{key}.sh"
+        end
 
         # Copy local files
-        Dir['recipes/*'].each {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
-        Dir['roles/*'].each   {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
-        hash['files'].each    {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        Dir['recipes/*'].each         {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
+        Dir['roles/*'].each           {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
+        (@config['files'] || []).each {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
         # Build install.sh
         if role
