@@ -45,6 +45,7 @@ module Sunzi
         template "templates/create/roles/app.sh",       "#{project}/roles/app.sh"
         template "templates/create/roles/db.sh",        "#{project}/roles/db.sh"
         template "templates/create/roles/web.sh",       "#{project}/roles/web.sh"
+        empty_directory                                 "#{project}/files"
       end
 
       def do_deploy(target, role)
@@ -109,6 +110,7 @@ module Sunzi
         # Copy local files
         Dir['recipes/*'].each         {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
         Dir['roles/*'].each           {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
+        Dir['files/*'].each           {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
         (@config['files'] || []).each {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
         # Build install.sh
