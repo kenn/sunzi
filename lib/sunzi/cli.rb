@@ -9,9 +9,10 @@ module Sunzi
       do_create(project)
     end
 
-    desc "deploy [user@host:port] [role] [using_sudo]", "Deploy sunzi project"
-    def deploy(target, role = nil, using_sudo = false)
-      do_deploy(target, role, using_sudo)
+    desc "deploy [user@host:port] [role] [--sudo]", "Deploy sunzi project"
+    method_options :sudo => false
+    def deploy(target, role = nil)
+      do_deploy(target, role, options.sudo?)
     end
 
     desc "compile", "Compile sunzi project"
@@ -47,8 +48,8 @@ module Sunzi
         template "templates/create/roles/web.sh",       "#{project}/roles/web.sh"
       end
 
-      def do_deploy(target, role, using_sudo)
-        sudo = 'sudo ' if using_sudo == 'true'
+      def do_deploy(target, role, force_sudo)
+        sudo = 'sudo ' if force_sudo
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
