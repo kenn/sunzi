@@ -9,9 +9,9 @@ module Sunzi
       do_create(project)
     end
 
-    desc "deploy [user@host:port] [role]", "Deploy sunzi project"
-    def deploy(target, role = nil)
-      do_deploy(target, role)
+    desc "deploy [user@host:port] [role] [using_sudo]", "Deploy sunzi project"
+    def deploy(target, role = nil, using_sudo = false)
+      do_deploy(target, role, using_sudo)
     end
 
     desc "compile", "Compile sunzi project"
@@ -47,7 +47,8 @@ module Sunzi
         template "templates/create/roles/web.sh",       "#{project}/roles/web.sh"
       end
 
-      def do_deploy(target, role)
+      def do_deploy(target, role, using_sudo)
+        sudo = 'sudo ' if using_sudo == 'true'
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
@@ -63,7 +64,7 @@ module Sunzi
         mkdir ~/sunzi &&
         cd ~/sunzi &&
         tar xz &&
-        bash install.sh
+        #{sudo}bash install.sh
         EOS
 
         remote_commands.strip! << ' && rm -rf ~/sunzi' if @config['preferences'] and @config['preferences']['erase_remote_folder']
