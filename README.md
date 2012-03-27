@@ -18,6 +18,7 @@ Its design goals are:
 
 ### What's new:
 
+* v0.8: Added `--sudo` option to `sunzi deploy`.
 * v0.7: Added `erase_remote_folder` and `cache_remote_recipes` preferences for customized behavior.
 * v0.6: System function sunzi::silencer() added for succinct log messages.
 * v0.5: Role-based configuration supported. Reworked directory structure. **Incompatible with previous versions**.
@@ -61,10 +62,11 @@ Commands
 --------
 
 ```bash
-$ sunzi                                 # Show command help
-$ sunzi compile                         # Compile Sunzi project
-$ sunzi create                          # Create a new Sunzi project
-$ sunzi deploy [user@host:port] [role]  # Deploy Sunzi project
+$ sunzi                                         # Show command help
+$ sunzi compile                                 # Compile Sunzi project
+$ sunzi create                                  # Create a new Sunzi project
+$ sunzi deploy [user@host:port] [role] [--sudo] # Deploy Sunzi project
+
 $ sunzi setup [linode|ec2]              # Setup a new VM on the Cloud services
 $ sunzi teardown [linode|ec2] [name]    # Teardown an existing VM on the Cloud services
 ```
