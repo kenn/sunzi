@@ -20,12 +20,12 @@ module Sunzi
       do_compile(role)
     end
 
-    desc "setup [linode|ec2]", "Setup a new VM"
+    desc "setup [openstack|linode|ec2]", "Setup a new VM"
     def setup(target)
       Cloud::Base.choose(self, target).setup
     end
 
-    desc "teardown [linode|ec2] [name]", "Teardown an existing VM"
+    desc "teardown [openstack|linode|ec2] [name]", "Teardown an existing VM"
     def teardown(target, name)
       Cloud::Base.choose(self, target).teardown(name)
     end
