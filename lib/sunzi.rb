@@ -10,8 +10,9 @@ module Sunzi
   autoload :Version,    'sunzi/version'
 
   module Cloud
-    autoload :Base,     'sunzi/cloud/base'
-    autoload :Linode,   'sunzi/cloud/linode'
-    autoload :EC2,      'sunzi/cloud/ec2'
+    autoload :Base,      'sunzi/cloud/base'
+    autoload :Linode,    'sunzi/cloud/linode'
+    autoload :EC2,       'sunzi/cloud/ec2'
+    autoload :OpenStack, 'sunzi/cloud/openstack'
   end
 end

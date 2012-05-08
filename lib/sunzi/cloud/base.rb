@@ -11,6 +11,8 @@ module Sunzi
           Cloud::Linode.new(cli)
         when 'ec2'
           Cloud::EC2.new(cli)
+        when 'openstack'
+          Cloud::OpenStack.new(cli)
         else
           abort_with "#{target} is not valid!"
         end

@@ -20,12 +20,12 @@ module Sunzi
       do_compile(role)
     end
 
-    desc "setup [linode|ec2]", "Setup a new VM"
+    desc "setup [openstack|linode|ec2]", "Setup a new VM"
     def setup(target)
       Cloud::Base.choose(self, target).setup
     end
 
-    desc "teardown [linode|ec2] [name]", "Teardown an existing VM"
+    desc "teardown [openstack|linode|ec2] [name]", "Teardown an existing VM"
     def teardown(target, name)
       Cloud::Base.choose(self, target).teardown(name)
     end
@@ -70,9 +70,11 @@ module Sunzi
 
         remote_commands.strip! << ' && rm -rf ~/sunzi' if @config['preferences'] and @config['preferences']['erase_remote_folder']
 
+        ssh_args = ""
+        ssh_args << "-i #{@config['preferences']['ssh_key']}" if @config['preferences']['ssh_key']
         local_commands = <<-EOS
         cd compiled
-        tar cz . | ssh -o 'StrictHostKeyChecking no' #{endpoint} -p #{port} '#{remote_commands}'
+        tar cz . | ssh -o 'StrictHostKeyChecking no' #{ssh_args} #{endpoint} -p #{port} '#{remote_commands}'
         EOS
 
         Open3.popen3(local_commands) do |stdin, stdout, stderr|

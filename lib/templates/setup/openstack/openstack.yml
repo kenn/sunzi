@@ -1,0 +1,34 @@
+---
+api_key: your_api_key
+openstack_username: "admin@myfoobar-stack.net"
+openstack_tenant: "admin@myfoobar-stack.net"
+openstack_auth_url: "http://auth.myfoobar-stack.net:5000/v2.0/tokens"
+
+# SSH keypair to use when creating a server
+ssh_key_name: my-foo-keypair
+
+# Use this server image
+image_filter: ubuntu-precise-amd64
+# Default image flavour
+image_flavor: m1.tiny
+
+# add / remove environments
+environments:
+  - dev
+  - staging
+  - production
+fqdn:
+  zone: example.com
+  production: %{host}.example.com
+  staging: %{host}.staging.example.com
+  dev: %{host}.dev.example.com
+label:
+  production: example-%{host}
+  staging: example-staging-%{host}
+  dev: example-dev-%{host}
+group:
+  production: example
+  staging: example-staging
+  dev: example-dev
+
+
