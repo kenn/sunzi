@@ -24,3 +24,7 @@ preferences:
   # Skip retrieving remote recipes when local copies already exist. This setting helps
   # iterative deploy testing considerably faster, when you have a lot of remote recipes.
   cache_remote_recipes: false
+
+  # Use this SSH key when authenticating, instead of password
+  ssh_key: ~/.ssh/my-foo-keypair
+

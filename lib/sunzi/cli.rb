@@ -70,9 +70,11 @@ module Sunzi
 
         remote_commands.strip! << ' && rm -rf ~/sunzi' if @config['preferences'] and @config['preferences']['erase_remote_folder']
 
+        ssh_args = ""
+        ssh_args << "-i #{@config['preferences']['ssh_key']}" if @config['preferences']['ssh_key']
         local_commands = <<-EOS
         cd compiled
-        tar cz . | ssh -o 'StrictHostKeyChecking no' #{endpoint} -p #{port} '#{remote_commands}'
+        tar cz . | ssh -o 'StrictHostKeyChecking no' #{ssh_args} #{endpoint} -p #{port} '#{remote_commands}'
         EOS
 
         Open3.popen3(local_commands) do |stdin, stdout, stderr|
