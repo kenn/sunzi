@@ -1,0 +1,23 @@
+---
+api_key: your_api_key
+client_id: your_client_id
+root_sshkey_path: ~/.ssh/id_rsa.pub
+
+# add / remove environments
+environments:
+  - production
+  - staging
+fqdn:
+  zone: example.com
+  production: '%{host}.example.com'
+  staging: '%{host}.staging.example.com'
+# filter out large lists by keyword
+distributions_filter: debian
+
+# dns takes "route53"
+dns: route53
+
+# only used when route53 is chosen for DNS
+route53:
+  key: your_aws_key
+  secret: your_aws_secret
