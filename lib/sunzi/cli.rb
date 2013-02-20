@@ -4,28 +4,28 @@ module Sunzi
   class Cli < Thor
     include Thor::Actions
 
-    desc "create", "Create sunzi project"
+    desc 'create', 'Create sunzi project'
     def create(project = 'sunzi')
       do_create(project)
     end
 
-    desc "deploy [user@host:port] [role] [--sudo]", "Deploy sunzi project"
+    desc 'deploy [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
     method_options :sudo => false
     def deploy(target, role = nil)
       do_deploy(target, role, options.sudo?)
     end
 
-    desc "compile", "Compile sunzi project"
+    desc 'compile', 'Compile sunzi project'
     def compile(role = nil)
       do_compile(role)
     end
 
-    desc "setup [linode|ec2|digital_ocean]", "Setup a new VM"
+    desc 'setup [linode|digital_ocean]', 'Setup a new VM'
     def setup(target)
       Cloud::Base.choose(self, target).setup
     end
 
-    desc "teardown [linode|ec2|digital_ocean] [name]", "Teardown an existing VM"
+    desc 'teardown [linode|digital_ocean] [name]', 'Teardown an existing VM'
     def teardown(target, name)
       Cloud::Base.choose(self, target).teardown(name)
     end
@@ -38,14 +38,14 @@ module Sunzi
       end
 
       def do_create(project)
-        template "templates/create/.gitignore",         "#{project}/.gitignore"
-        template "templates/create/sunzi.yml",          "#{project}/sunzi.yml"
-        template "templates/create/install.sh",         "#{project}/install.sh"
-        template "templates/create/recipes/sunzi.sh",   "#{project}/recipes/sunzi.sh"
-        template "templates/create/recipes/ssh_key.sh", "#{project}/recipes/ssh_key.sh"
-        template "templates/create/roles/app.sh",       "#{project}/roles/app.sh"
-        template "templates/create/roles/db.sh",        "#{project}/roles/db.sh"
-        template "templates/create/roles/web.sh",       "#{project}/roles/web.sh"
+        template 'templates/create/.gitignore',         "#{project}/.gitignore"
+        template 'templates/create/sunzi.yml',          "#{project}/sunzi.yml"
+        template 'templates/create/install.sh',         "#{project}/install.sh"
+        template 'templates/create/recipes/sunzi.sh',   "#{project}/recipes/sunzi.sh"
+        template 'templates/create/recipes/ssh_key.sh', "#{project}/recipes/ssh_key.sh"
+        template 'templates/create/roles/app.sh',       "#{project}/roles/app.sh"
+        template 'templates/create/roles/db.sh',        "#{project}/roles/db.sh"
+        template 'templates/create/roles/web.sh',       "#{project}/roles/web.sh"
       end
 
       def do_deploy(target, role, force_sudo)
@@ -91,7 +91,7 @@ module Sunzi
 
       def do_compile(role)
         # Check if you're in the sunzi directory
-        abort_with "You must be in the sunzi folder" unless File.exists?('sunzi.yml')
+        abort_with 'You must be in the sunzi folder' unless File.exists?('sunzi.yml')
         # Check if role exists
         abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
 
@@ -115,7 +115,7 @@ module Sunzi
 
         # Build install.sh
         if role
-          create_file 'compiled/install.sh', File.binread("install.sh") << "\n" << File.binread("roles/#{role}.sh")
+          create_file 'compiled/install.sh', File.binread('install.sh') << "\n" << File.binread("roles/#{role}.sh")
         else
           copy_file File.expand_path('install.sh'), 'compiled/install.sh'
         end
