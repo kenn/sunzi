@@ -30,7 +30,7 @@ Quickstart
 Install:
 
 ```bash
-$ gem install sunzi
+$ [sudo] gem install sunzi
 ```
 
 Go into your project directory (if it's a Rails project, `config` would be a good place to start with), then:
@@ -63,13 +63,13 @@ Commands
 --------
 
 ```bash
-$ sunzi                                         # Show command help
-$ sunzi compile                                 # Compile Sunzi project
-$ sunzi create                                  # Create a new Sunzi project
-$ sunzi deploy [user@host:port] [role] [--sudo] # Deploy Sunzi project
+$ sunzi                                           # Show command help
+$ sunzi compile                                   # Compile Sunzi project
+$ sunzi create                                    # Create a new Sunzi project
+$ sunzi deploy [user@host:port] [role] [--sudo]   # Deploy Sunzi project
 
-$ sunzi setup [linode|digital_ocean]            # Setup a new VM on the Cloud services
-$ sunzi teardown [linode|digital_ocean] [name]  # Teardown an existing VM on the Cloud services
+$ sunzi setup [linode|digital_ocean]              # Setup a new VM on the cloud services
+$ sunzi teardown [linode|digital_ocean] [name]    # Teardown an existing VM on the cloud services
 ```
 
 Directory structure
@@ -171,7 +171,7 @@ The following screenshot says it all.
 
 ![Sunzi for Linode](http://farm8.staticflickr.com/7210/6783789868_ab89010d5c.jpg)
 
-Right now, only [Linode](http://www.linode.com/) is supported, but EC2 and Rackspace are coming.
+Right now, only [Linode](http://www.linode.com/) and [DigitalOcean](https://www.digitalocean.com) are supported.
 
 For DNS, Linode and [Amazon Route 53](http://aws.amazon.com/route53/) are supported.
 
