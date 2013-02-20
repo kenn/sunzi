@@ -1,8 +1,5 @@
 Sunzi::Dependency.load('linode')
 
-# Workaround the bug: https://github.com/rick/linode/issues/12
-YAML::ENGINE.yamler = 'syck'
-
 module Sunzi
   module Cloud
     class Linode < Base
@@ -30,7 +27,7 @@ module Sunzi
 
         # Ask environment and hostname
         @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
-        @host = ask('hostname? (only the last part of subdomain): ', String).to_s
+        @host = ask('hostname? (only the first part of subdomain): ', String).to_s
 
         @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
         @label = @config['label'][@env].gsub(/%{host}/, @host)
@@ -200,14 +197,12 @@ module Sunzi
         # Delete DNS record
         case @config['dns']
         when 'linode'
-          # Set the public IP to Linode DNS Manager
-          say "deleting the public IP to Linode DNS Manager..."
+          say 'deleting the public IP from Linode DNS Manager...'
           @domainid = @api.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
           @resource = @api.domain.resource.list(:DomainID => @domainid).find{|i| i.target == @instance[:public_ip] }
           @api.domain.resource.delete(:DomainID => @domainid, :ResourceID => @resource.resourceid)
         when 'route53'
-          # Set the public IP to AWS Route 53
-          say "deleting the public IP to AWS Route 53..."
+          say 'deleting the public IP from AWS Route 53...'
           @record = @route53_zone.get_records.find{|i| i.values.first == @instance[:public_ip] }
           @record.delete if @record
         end
@@ -222,6 +217,7 @@ module Sunzi
         Sunzi::Dependency.load('route53')
         route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
         @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
+        abort_with "zone for #{@config['fqdn']['zone']} was not found on route53!" unless @route53_zone
       end
 
       def wait_for(action)

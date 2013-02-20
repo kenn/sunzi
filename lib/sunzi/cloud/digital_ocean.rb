@@ -18,42 +18,27 @@ module Sunzi
 
         # When route53 is specified for DNS, check if it's properly configured and if not, fail earlier.
         setup_route53 if @config['dns'] == 'route53'
-        abort_with 'Linode DNS cannot use it. You must have your route53 settings in digital_ocean.yml' unless @config['dns'] == 'route53'
-
-        @sshkey = File.read(File.expand_path(@config['root_sshkey_path'])).chomp
-        if @sshkey.match(/\n/)
-          abort_with "RootSSHKey #{@sshkey.inspect} must not be multi-line! Check inside \"#{@config['root_sshkey_path']}\""
-        end
-        @ssh_key_name = @sshkey.split.last
 
         @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
-        say "searching your ssh key..."
-        keys = @api.ssh_keys.list.ssh_keys
-        found = false unless keys.count > 0
-        keys.each do |key|
-          found = key if key.name == @ssh_key_name
-        end
-        abort_with "RootSSHKey cannot found. please setting up your ssh key on DigitalOcean Dashboards.\nname: #{@ssh_key_name}\ndescription:\n#{@sshkey}" unless found
-        say "your ssh key found."
 
         # Ask environment and hostname
         @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
-        @host = ask('hostname? (only the last part of subdomain): ', String).to_s
+        @host = ask('hostname? (only the first part of subdomain): ', String).to_s
 
         @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
-
+        @name = @config['name'][@env].gsub(/%{host}/, @host)
 
         # Choose a size
         result = @api.sizes.list.sizes
         result.each{|i| say "#{i.id}: #{i.name}" }
-        @sizeid = ask('which size?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
-        @size_name = result.find{|i| i.id == @sizeid }.name
+        @size_id = ask('which size?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
+        @size_name = result.find{|i| i.id == @size_id }.name
 
         # Choose a region
         result = @api.regions.list.regions
         result.each{|i| say "#{i.id}: #{i.name}" }
-        @regionid = ask('which region?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
-        @region_location = result.find{|i| i.id == @regionid }.name
+        @region_id = ask('which region?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
+        @region_name = result.find{|i| i.id == @region_id }.name
 
         # Choose a image
         result = @api.images.list({'filter' => 'global'}).images
@@ -61,52 +46,36 @@ module Sunzi
           result = result.select{|i| i.distribution.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }
         end
         result.each{|i| say "#{i.id}: #{i.name}" }
-        @imageid = ask('which image?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
-        @image_name = result.find{|i| i.id == @imageid }.name
+        @image_id = ask('which image?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
+        @image_name = result.find{|i| i.id == @image_id }.name
 
         # Go ahead?
         moveon = ask("Are you ready to go ahead and create #{@fqdn}? (y/n) ", String) {|q| q.in = ['y','n']}
         exit unless moveon == 'y'
 
-        # Search SSH Key
-        say "re-saerching a ssh key..."
-        keys = @api.ssh_keys.list.ssh_keys
-        found = false unless keys.count > 0
-        keys.each do |key|
-          found = key if key.name == @ssh_key_name
-        end
-
-        if found
-          found_key = @api.ssh_keys.show(found.id)
-          unless found_key.ssh_key.ssh_pub_key == @sshkey
-            abort_with "sshkey found, but different keys. please check it on your DigitalOcean's Dashboards"
-          end
-        else
-          abort_with "sshkey does not found. please check it on your DigitalOcean's Dashboards"
-        end
-
+        @ssh_key_ids = @api.ssh_keys.list.ssh_keys.map(&:id).join(',')
 
         # Create
         say "creating a new droplets..."
-        result = @api.droplets.create(:name => @fqdn, :size_id => @sizeid, :image_id => @imageid, :region_id => @regionid, :ssh_key_ids => found.id)
+        result = @api.droplets.create(:name => @name,
+          :size_id => @size_id,
+          :image_id => @image_id,
+          :region_id => @region_id,
+          :ssh_key_ids => @ssh_key_ids)
 
-        @dropletid = result.droplet.id
-        say "created a new instance: droplet id = #{@dropletid}"
+        @droplet_id = result.droplet.id
+        say "Created a new droplet (id: #{@droplet_id}). Booting..."
 
         # Boot
-        say 'Done. Wait for Booting...'
-        while @api.droplets.show(@dropletid).droplet.status.downcase != 'active'
+        while @api.droplets.show(@droplet_id).droplet.status.downcase != 'active'
           sleep 5
         end
-        say 'Booting.'
 
-        @public_ip = @api.droplets.show(@dropletid).droplet.ip_address
-        say "fetch public ip address: ip address = #{@public_ip}"
+        @public_ip = @api.droplets.show(@droplet_id).droplet.ip_address
+        say "Done. ip address = #{@public_ip}"
 
         # Register IP to DNS
         case @config['dns']
-        when 'linode'
-          abort_with 'Linode DNS cannot use it. You must have your route53 settings in digital_ocean.yml'
         when 'route53'
           # Set the public IP to AWS Route 53
           say "Setting the public IP to AWS Route 53..."
@@ -115,18 +84,20 @@ module Sunzi
 
         # Save the instance info
         hash = {
-          :dropletid => @dropletid,
+          :droplet_id => @droplet_id,
           :env => @env,
           :host => @host,
           :fqdn => @fqdn,
+          :name => @name,
           :ip_address => @public_ip,
-          :sizeid => @sizeid,
-          :redionid => @regionid,
-          :region_location => @region_location,
-          :imageid => @imageid,
+          :size_id => @size_id,
+          :size_name => @size_name,
+          :region_id => @region_id,
+          :region_name => @region_name,
+          :image_id => @image_id,
           :image_name => @image_name,
         }
-        @cli.create_file "digital_ocean/instances/#{@host}.yml", YAML.dump(hash)
+        @cli.create_file "digital_ocean/instances/#{@name}.yml", YAML.dump(hash)
 
       end
 
@@ -139,7 +110,7 @@ module Sunzi
         setup_route53 if @config['dns'] == 'route53'
 
         @instance = YAML.load(File.read("digital_ocean/instances/#{name}.yml"))
-        @droplet_id = @instance[:dropletid]
+        @droplet_id = @instance[:droplet_id]
 
         @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
 
@@ -147,17 +118,14 @@ module Sunzi
         moveon = ask("Are you sure about deleting #{@instance[:fqdn]} permanently? (y/n) ", String) {|q| q.in = ['y','n']}
         exit unless moveon == 'y'
 
-
+        # Delete the droplet
         say 'deleting droplet...'
         @api.droplets.delete(@droplet_id)
 
         # Delete DNS record
         case @config['dns']
-        when 'linode'
-          abort_with 'Linode DNS cannot use it. You must have your route53 settings in digital_ocean.yml'
         when 'route53'
-          # Set the public IP to AWS Route 53
-          say "deleting the public IP to AWS Route 53..."
+          say 'deleting the public IP from AWS Route 53...'
           @record = @route53_zone.get_records.find{|i| i.values.first == @instance[:ip_address] }
           @record.delete if @record
         end
@@ -172,6 +140,7 @@ module Sunzi
         Sunzi::Dependency.load('route53')
         route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
         @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
+        abort_with "zone for #{@config['fqdn']['zone']} was not found on route53!" unless @route53_zone
       end
     end
   end

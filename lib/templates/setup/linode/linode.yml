@@ -12,11 +12,11 @@ environments:
   - staging
 fqdn:
   zone: example.com
-  production: %{host}.example.com
-  staging: %{host}.staging.example.com
+  production: '%{host}.example.com'
+  staging: '%{host}.staging.example.com'
 label:
-  production: example-%{host}
-  staging: example-staging-%{host}
+  production: 'example-%{host}'
+  staging: 'example-staging-%{host}'
 group:
   production: example
   staging: example-staging
