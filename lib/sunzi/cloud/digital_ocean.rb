@@ -28,7 +28,7 @@ module Sunzi
         if @host.nil? || @host.empty?
           @name = @name.gsub(/%{host}/, @host)
         else
-          @name = @name.gsub(/-%{host}/, '')
+          @name = @name.gsub(/\-%{host}/, '')
         end
 
         # Choose a size
