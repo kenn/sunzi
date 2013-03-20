@@ -26,9 +26,9 @@ module Sunzi
 
         @name = @config['name'][@env]
         if @host.nil? || @host.empty?
-          @name = @name.gsub(/%{host}/, @host)
-        else
           @name = @name.gsub(/\-%{host}/, '')
+        else
+          @name = @name.gsub(/%{host}/, @host)
         end
 
         # Choose a size
