@@ -46,7 +46,7 @@ module Sunzi
         # Choose a image
         result = @api.images.list({'filter' => 'global'}).images
         if @config['distributions_filter']
-          result = result.select{|i| i.distribution.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }
+          result = result.select{|i| i.name.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }.sort_by{|h|h[:name]}.reverse
         end
         result.each{|i| say "#{i.id}: #{i.name}" }
         @image_id = ask('which image?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
