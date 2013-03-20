@@ -25,7 +25,7 @@ module Sunzi
         @host = ask('subdomain name? (leave empty if none): ', String).to_s
 
         @name = @config['name'][@env]
-        if @host.present?
+        if @host.nil? || @host.empty?
           @name = @name.gsub(/%{host}/, @host)
         else
           @name = @name.gsub(/-%{host}/, '')
