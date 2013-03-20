@@ -53,7 +53,7 @@ module Sunzi
         @image_name = result.find{|i| i.id == @image_id }.name
 
         # Go ahead?
-        moveon = ask("Are you ready to go ahead and create #{@name}? (y/n) ", String) {|q| q.in = ['y','n']}
+        moveon = ask("Are you ready to go ahead and create host \"#{@name}\"? (y/n) ", String) {|q| q.in = ['y','n']}
         exit unless moveon == 'y'
 
         @ssh_key_ids = @api.ssh_keys.list.ssh_keys.map(&:id).join(',')
