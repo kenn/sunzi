@@ -18,6 +18,7 @@ Its design goals are:
 
 ### What's new:
 
+* v1.0: System functions are refactored into sunzi.mute() and sunzi.install().
 * v0.9: Support for [DigitalOcean](https://www.digitalocean.com) setup / teardown.
 * v0.8: Added `--sudo` option to `sunzi deploy`.
 * v0.7: Added `erase_remote_folder` and `cache_remote_recipes` preferences for customized behavior.
