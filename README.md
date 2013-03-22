@@ -83,7 +83,7 @@ sunzi/
   sunzi.yml       # add custom attributes and remote recipes here
 
   recipes/        # put commonly used scripts here, referred from install.sh
-    ssh_key.sh
+    sunzi.sh
   roles/          # when role is specified, scripts here will be concatenated
     app.sh        # to install.sh in the compile phase
     db.sh

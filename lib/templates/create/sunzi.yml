@@ -1,9 +1,8 @@
 ---
 # Dynamic variables here will be compiled to individual files in compiled/attributes.
 attributes:
-  ssh_key: id_rsa.pub
-  environment: development
-  ruby_version: 1.9.3
+  environment: production
+  ruby_version: 2.0.0
 
 # Remote recipes here will be downloaded to compiled/recipes.
 recipes:
@@ -12,8 +11,8 @@ recipes:
   # mongodb-10gen: https://raw.github.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
 
 # Files specified here will be copied to compiled/files.
-files:
-  - ~/.ssh/id_rsa.pub
+# files:
+#   - ~/.ssh/id_rsa.pub
 
 # Fine tune how Sunzi should work.
 preferences:
