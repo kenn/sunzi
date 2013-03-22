@@ -9,8 +9,6 @@ module Sunzi
         case target
         when 'linode'
           Cloud::Linode.new(cli)
-        when 'ec2'
-          Cloud::EC2.new(cli)
         when 'digital_ocean'
           Cloud::DigitalOcean.new(cli)
         else

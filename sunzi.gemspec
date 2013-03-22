@@ -1,25 +1,21 @@
-# -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
-require "sunzi/version"
+# coding: utf-8
 
-Gem::Specification.new do |s|
-  s.name        = "sunzi"
-  s.version     = Sunzi::VERSION
-  s.authors     = ["Kenn Ejima"]
-  s.email       = ["kenn.ejima@gmail.com"]
-  s.homepage    = "http://github.com/kenn/sunzi"
-  s.summary     = %q{Server provisioning utility for minimalists}
-  s.description = %q{Server provisioning utility for minimalists}
+Gem::Specification.new do |spec|
+  spec.name          = 'sunzi'
+  spec.version       = '0.9.1' # retrieve this value by: Gem.loaded_specs['sunzi'].version.to_s
+  spec.authors       = ['Kenn Ejima']
+  spec.email         = ['kenn.ejima@gmail.com']
+  spec.homepage      = 'http://github.com/kenn/sunzi'
+  spec.summary       = %q{Server provisioning utility for minimalists}
+  spec.description   = %q{Server provisioning utility for minimalists}
+  spec.license       = 'MIT'
 
-  s.rubyforge_project = "sunzi"
+  spec.files         = `git ls-files`.split($/)
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.require_paths = ['lib']
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
-
-  # s.add_development_dependency "rspec"
-  s.add_runtime_dependency "thor"
-  s.add_runtime_dependency "rainbow"
-  s.add_development_dependency "rake"
+  spec.add_runtime_dependency 'thor'
+  spec.add_runtime_dependency 'rainbow'
+  spec.add_development_dependency 'rake'
 end
