@@ -30,6 +30,11 @@ module Sunzi
       Cloud::Base.choose(self, target).teardown(name)
     end
 
+    desc 'version', 'Show version'
+    def version
+      puts Gem.loaded_specs['sunzi'].version.to_s
+    end
+
     no_tasks do
       include Sunzi::Utility
 
