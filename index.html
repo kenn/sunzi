@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sunzi by kenn</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Sunzi</h1>
+        <p class="header">Sunzi: Server provisioning utility for minimalists</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/kenn/sunzi/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/kenn/sunzi/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/kenn/sunzi">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/kenn">kenn</a></p>
+
+
+      </header>
+      <section>
+        <h1>Sunzi</h1>
+
+<pre><code>"The supreme art of war is to subdue the enemy without fighting." - Sunzi
+</code></pre>
+
+<p>Sunzi is the easiest <a href="http://en.wikipedia.org/wiki/Provisioning#Server_provisioning">server provisioning</a> utility designed for mere mortals. If Chef or Puppet is driving you nuts, try Sunzi!</p>
+
+<p>Sunzi assumes that modern Linux distributions have (mostly) sane defaults and great package managers.</p>
+
+<p>Its design goals are:</p>
+
+<ul>
+<li>
+<strong>It's just shell script.</strong> No clunky Ruby DSL involved. Most of the information about server configuration on the web is written in shell commands. Just copy-paste them, rather than translate it into an arbitrary DSL. Also, Bash is the greatest common denominator on minimum Linux installs.</li>
+<li>
+<strong>Focus on diff from default.</strong> No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations make it difficult to understand what you are really doing.</li>
+<li>
+<strong>Always use the root user.</strong> Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.</li>
+<li>
+<strong>Minimum dependencies.</strong> No configuration server required. You don't even need a Ruby runtime on the remote server.</li>
+</ul><h3>What's new:</h3>
+
+<ul>
+<li>v1.0: System functions are refactored into sunzi.mute() and sunzi.install().</li>
+<li>v0.9: Support for <a href="https://www.digitalocean.com">DigitalOcean</a> setup / teardown.</li>
+<li>v0.8: Added <code>--sudo</code> option to <code>sunzi deploy</code>.</li>
+<li>v0.7: Added <code>erase_remote_folder</code> and <code>cache_remote_recipes</code> preferences for customized behavior.</li>
+<li>v0.6: System function sunzi::silencer() added for succinct log messages.</li>
+<li>v0.5: Role-based configuration supported. Reworked directory structure. <strong>Incompatible with previous versions</strong>.</li>
+</ul><h2>Quickstart</h2>
+
+<p>Install:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span><span class="o">[</span>sudo<span class="o">]</span> gem install sunzi
+</pre></div>
+
+<p>Go into your project directory (if it's a Rails project, <code>config</code> would be a good place to start with), then:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>sunzi create
+</pre></div>
+
+<p>It generates a <code>sunzi</code> folder along with subdirectories and templates. Inside <code>sunzi</code>, there are <code>sunzi.yml</code> and <code>install.sh</code>. Those two are the most important files that you mainly work on.</p>
+
+<p>Go into the <code>sunzi</code> directory, then run <code>sunzi deploy</code>:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>sunzi
+<span class="nv">$ </span>sunzi deploy example.com
+</pre></div>
+
+<p>Now, what it actually does is:</p>
+
+<ol>
+<li>Compile <code>sunzi.yml</code> to generate attributes and retrieve remote recipes, then copy files into the <code>compiled</code> directory</li>
+<li>SSH to <code>example.com</code> and login as <code>root</code>
+</li>
+<li>Transfer the content of the <code>compiled</code> directory to the remote server and extract in <code>$HOME/sunzi</code>
+</li>
+<li>Run <code>install.sh</code> on the remote server</li>
+</ol><p>As you can see, all you need to do is edit <code>install.sh</code> and add some shell commands. That's it.</p>
+
+<p>A Sunzi project without any recipes or roles is totally fine, so that you can start small, go big as you get along.</p>
+
+<h2>Commands</h2>
+
+<div class="highlight"><pre><span class="nv">$ </span>sunzi                                           <span class="c"># Show command help</span>
+<span class="nv">$ </span>sunzi compile                                   <span class="c"># Compile Sunzi project</span>
+<span class="nv">$ </span>sunzi create                                    <span class="c"># Create a new Sunzi project</span>
+<span class="nv">$ </span>sunzi deploy <span class="o">[</span>user@host:port<span class="o">]</span> <span class="o">[</span>role<span class="o">]</span> <span class="o">[</span>--sudo<span class="o">]</span>   <span class="c"># Deploy Sunzi project</span>
+
+<span class="nv">$ </span>sunzi setup <span class="o">[</span>linode|digital_ocean<span class="o">]</span>              <span class="c"># Setup a new VM on the cloud services</span>
+<span class="nv">$ </span>sunzi teardown <span class="o">[</span>linode|digital_ocean<span class="o">]</span> <span class="o">[</span>name<span class="o">]</span>    <span class="c"># Teardown an existing VM on the cloud services</span>
+</pre></div>
+
+<h2>Directory structure</h2>
+
+<p>Here's the directory structure that <code>sunzi create</code> automatically generates:</p>
+
+<div class="highlight"><pre>sunzi/
+  install.sh      <span class="c"># main script</span>
+  sunzi.yml       <span class="c"># add custom attributes and remote recipes here</span>
+
+  recipes/        <span class="c"># put commonly used scripts here, referred from install.sh</span>
+    sunzi.sh
+  roles/          <span class="c"># when role is specified, scripts here will be concatenated</span>
+    app.sh        <span class="c"># to install.sh in the compile phase</span>
+    db.sh
+    web.sh
+  compiled/       <span class="c"># everything under this folder will be transferred to the</span>
+                  <span class="c"># remote server (do not edit directly)</span>
+</pre></div>
+
+<h2>How do you pass dynamic values to a recipe?</h2>
+
+<p>In the compile phase, attributes defined in <code>sunzi.yml</code> are split into multiple files in <code>compiled/attributes</code>, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.</p>
+
+<p>The convention for argument passing to a recipe is to use <code>$1</code>, <code>$2</code>, etc. and put a comment line for each argument.</p>
+
+<p>For instance, given a recipe <code>greeting.sh</code>:</p>
+
+<div class="highlight"><pre><span class="c"># Greeting</span>
+<span class="c"># $1: Name for goodbye</span>
+<span class="c"># $2: Name for hello</span>
+
+<span class="nb">echo</span> <span class="s2">"Goodbye $1, Hello $2!"</span>
+</pre></div>
+
+<p>With <code>sunzi.yml</code>:</p>
+
+<div class="highlight"><pre><span class="l-Scalar-Plain">attributes</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">goodbye</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Chef</span>
+  <span class="l-Scalar-Plain">hello</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Sunzi</span>
+</pre></div>
+
+<p>Then, include the recipe in <code>install.sh</code>:</p>
+
+<div class="highlight"><pre><span class="nb">source </span>recipes/greeting.sh <span class="k">$(</span>cat attributes/goodbye<span class="k">)</span> <span class="k">$(</span>cat attributes/hello<span class="k">)</span>
+</pre></div>
+
+<p>Now, you get the following result. Isn't it awesome?</p>
+
+<pre><code>Goodbye Chef, Hello Sunzi!
+</code></pre>
+
+<h2>Remote Recipes</h2>
+
+<p>Recipes can be retrieved remotely via HTTP. Put a URL in the recipes section of <code>sunzi.yml</code>, and Sunzi will automatically load the content and put it into the <code>compiled/recipes</code> folder in the compile phase.</p>
+
+<p>For instance, if you have the following line in <code>sunzi.yml</code>,</p>
+
+<div class="highlight"><pre><span class="l-Scalar-Plain">recipes</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">rvm</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh</span>
+</pre></div>
+
+<p><code>rvm.sh</code> will be available and you can refer to that recipe by <code>source recipes/rvm.sh</code>.</p>
+
+<p>You may find sample recipes in this repository useful: <a href="https://github.com/kenn/sunzi-recipes">https://github.com/kenn/sunzi-recipes</a></p>
+
+<h2>Role-based configuration</h2>
+
+<p>You probably have different configurations between <strong>web servers</strong> and <strong>database servers</strong>.</p>
+
+<p>No problem - how Sunzi handles role-based configuration is refreshingly simple.</p>
+
+<p>Shell scripts under the <code>roles</code> directory, such as <code>web.sh</code> or <code>db.sh</code>, are automatically recognized as a role. The role script will be appended to <code>install.sh</code> at deploy, so you should put common configurations in <code>install.sh</code> and role specific procedures in the role script.</p>
+
+<p>For instance, when you set up a new web server, deploy with a role name:</p>
+
+<div class="highlight"><pre>sunzi deploy example.com web
+</pre></div>
+
+<p>It is equivalent to running <code>install.sh</code>, followed by <code>web.sh</code>.</p>
+
+<h2>Cloud Support</h2>
+
+<p>You can setup a new VM, or teardown an existing VM interactively. Use <code>sunzi setup</code> and <code>sunzi teardown</code> for that.</p>
+
+<p>The following screenshot says it all.</p>
+
+<p><img src="http://farm8.staticflickr.com/7210/6783789868_ab89010d5c.jpg" alt="Sunzi for Linode"></p>
+
+<p>Right now, only <a href="http://www.linode.com/">Linode</a> and <a href="https://www.digitalocean.com">DigitalOcean</a> are supported.</p>
+
+<p>For DNS, Linode and <a href="http://aws.amazon.com/route53/">Amazon Route 53</a> are supported.</p>
+
+<h2>Vagrant</h2>
+
+<p>If you're using Sunzi with <a href="http://vagrantup.com/">Vagrant</a>, make sure that you have a root access via SSH.</p>
+
+<p>An easy way is to edit <code>Vagrantfile</code>:</p>
+
+<div class="highlight"><pre><span class="ss">Vagrant</span><span class="p">:</span><span class="ss">:Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="ss">:shell</span> <span class="k">do</span> <span class="o">|</span><span class="n">shell</span><span class="o">|</span>
+    <span class="n">shell</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="s2">"chpasswd.sh"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>with <code>chpasswd.sh</code>:</p>
+
+<div class="highlight"><pre><span class="c">#!/bin/bash</span>
+
+sudo <span class="nb">echo</span> <span class="s1">'root:vagrant'</span> | /usr/sbin/chpasswd
+</pre></div>
+
+<p>and now run <code>vagrant up</code>, it will change the root password to <code>vagrant</code>.</p>
+
+<p>Also keep in mind that you need to specify the port number 2222.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>sunzi deploy localhost:2222
+</pre></div>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
