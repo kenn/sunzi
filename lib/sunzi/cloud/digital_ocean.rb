@@ -22,14 +22,10 @@ module Sunzi
 
         # Ask environment and hostname
         @env = ask("create for which environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
-        @host = ask('subdomain name? (leave empty if none): ', String).to_s
+        @host = ask('Hostname? (leave empty if none [example: web01]): ', String).to_s
 
         @name = @config['name'][@env]
-        if @host.nil? || @host.empty?
-          @name = @name.gsub(/\-%{host}/, '')
-        else
-          @name = @name.gsub(/%{host}/, @host)
-        end
+        @name += "-#{@host}" unless @host.nil? || @host.empty?
 
         # Choose a size
         result = @api.sizes.list.sizes
