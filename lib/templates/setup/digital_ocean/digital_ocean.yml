@@ -6,13 +6,13 @@ client_id: your_client_id
 environments:
   - production
   - staging
-fqdn:
-  zone: example.com
-  production: '%{host}.example.com'
-  staging: '%{host}.staging.example.com'
+# fqdn:
+#   zone: example.com
+#   production: '%{host}.example.com'
+#   staging: '%{host}.staging.example.com'
 name:
-  production: 'example-%{host}'
-  staging: 'example-staging-%{host}'
+  production: 'example'
+  staging: 'example-staging'
 
 # filter out large lists by keyword
 distributions_filter: debian

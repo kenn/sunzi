@@ -12,21 +12,20 @@ module Sunzi
 
         @config = YAML.load(File.read('digital_ocean/digital_ocean.yml'))
 
-        if @config['fqdn']['zone'] == 'example.com'
+        if @config['fqdn'] && @config['fqdn']['zone'] == 'example.com'
           abort_with 'You must have your own settings in digital_ocean.yml'
         end
-
         # When route53 is specified for DNS, check if it's properly configured and if not, fail earlier.
         setup_route53 if @config['dns'] == 'route53'
 
         @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
 
         # Ask environment and hostname
-        @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
-        @host = ask('hostname? (only the first part of subdomain): ', String).to_s
+        @env = ask("create for which environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
+        @host = ask('Hostname? (leave empty if none [example: web01]): ', String).to_s
 
-        @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
-        @name = @config['name'][@env].gsub(/%{host}/, @host)
+        @name = @config['name'][@env]
+        @name += "-#{@host}" unless @host.nil? || @host.empty?
 
         # Choose a size
         result = @api.sizes.list.sizes
@@ -43,14 +42,14 @@ module Sunzi
         # Choose a image
         result = @api.images.list({'filter' => 'global'}).images
         if @config['distributions_filter']
-          result = result.select{|i| i.distribution.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }
+          result = result.select{|i| i.name.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }.sort_by{|h|h[:name]}.reverse
         end
         result.each{|i| say "#{i.id}: #{i.name}" }
         @image_id = ask('which image?: ', Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
         @image_name = result.find{|i| i.id == @image_id }.name
 
         # Go ahead?
-        moveon = ask("Are you ready to go ahead and create #{@fqdn}? (y/n) ", String) {|q| q.in = ['y','n']}
+        moveon = ask("Are you ready to go ahead and create host \"#{@name}\"? (y/n) ", String) {|q| q.in = ['y','n']}
         exit unless moveon == 'y'
 
         @ssh_key_ids = @api.ssh_keys.list.ssh_keys.map(&:id).join(',')
