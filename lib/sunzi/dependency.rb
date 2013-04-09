@@ -5,7 +5,7 @@ module Sunzi
         'linode' =>   { :require => 'linode',   :version => '>= 0.7.9' },
         'highline' => { :require => 'highline', :version => '>= 1.6.11'},
         'route53' =>  { :require => 'route53',  :version => '>= 0.2.1' },
-        'digital_ocean' =>  { :require => 'digital_ocean',  :version => '>= 0.0.1' },
+        'digital_ocean' =>  { :require => 'digital_ocean',  :version => '>= 1.0.0' },
       }
     end
 
