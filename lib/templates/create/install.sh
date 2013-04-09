@@ -33,13 +33,12 @@ ruby_version=$(cat attributes/ruby_version)
 
 if [[ "$(which ruby)" != /usr/local/rvm/rubies/ruby-$ruby_version* ]]; then
   echo "Installing ruby-$ruby_version"
-  sunzi.install build-essential libssl-dev libreadline6-dev
-  rvm install $ruby_version
+  # Install dependencies using RVM autolibs - see https://blog.engineyard.com/2013/rvm-ruby-2-0
+  rvm install --autolibs=3 $ruby_version
   rvm $ruby_version --default
   echo 'gem: --no-ri --no-rdoc' > ~/.gemrc
 
   # Install Bundler
-  gem update --system
   gem install bundler
 fi
 
