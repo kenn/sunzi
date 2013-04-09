@@ -1,15 +1,15 @@
 # This file is used to define functions under the sunzi.* namespace.
 
-# Set $sunzi_pkg to "aptitude" or "yum", or abort.
+# Set $sunzi_pkg to "apt-get" or "yum", or abort.
 #
-if which aptitude >/dev/null 2>&1; then
-  export sunzi_pkg=aptitude
+if which apt-get >/dev/null 2>&1; then
+  export sunzi_pkg=apt-get
 elif which yum >/dev/null 2>&1; then
   export sunzi_pkg=yum
 fi
 
 if [ "$sunzi_pkg" = '' ]; then
-  echo 'sunzi only supports aptitude and yum!' >&2
+  echo 'sunzi only supports apt-get or yum!' >&2
   exit 1
 fi
 
@@ -24,7 +24,7 @@ function sunzi.mute() {
 # Installer
 #
 function sunzi.installed() {
-  if [ "$sunzi_pkg" = 'aptitude' ]; then
+  if [ "$sunzi_pkg" = 'apt-get' ]; then
     dpkg -s $@ >/dev/null 2>&1
   elif [ "$sunzi_pkg" = 'yum' ]; then
     rpm -qa | grep $@ >/dev/null

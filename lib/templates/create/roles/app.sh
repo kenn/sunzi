@@ -19,7 +19,7 @@ fi
 if [[ "$(which ruby)" == /usr/local/rvm/rubies/ruby-$RUBY_VERSION* ]]; then
   echo 'ruby-$RUBY_VERSION already installed'
 else
-  aptitude -y install curl build-essential libssl-dev libreadline6-dev
+  apt-get -y install curl build-essential libssl-dev libreadline6-dev
   rvm install $RUBY_VERSION
   rvm $RUBY_VERSION --default
   echo 'gem: --no-ri --no-rdoc' > ~/.gemrc

@@ -11,8 +11,8 @@ export DEBIAN_FRONTEND=noninteractive
 # source recipes/dotdeb.sh
 
 # Update installed packages
-sunzi.mute "aptitude update"
-sunzi.mute "aptitude -y safe-upgrade"
+sunzi.mute "apt-get update"
+sunzi.mute "apt-get -y upgrade"
 
 # Install packages
 sunzi.install "git-core ntp curl"
