@@ -32,6 +32,9 @@ function sunzi.installed() {
   return $?
 }
 
+# When there's "set -e" in install.sh, sunzi.install should be used with if statement,
+# otherwise the script may exit unexpectedly when the package is already installed.
+#
 function sunzi.install() {
   for name in $@
   do

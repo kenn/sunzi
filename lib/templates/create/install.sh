@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Load base utility functions like sunzi.mute() and sunzi.install()
 source recipes/sunzi.sh
@@ -15,7 +16,7 @@ sunzi.mute "apt-get update"
 sunzi.mute "apt-get -y upgrade"
 
 # Install packages
-sunzi.install "git-core ntp curl"
+sunzi.mute "apt-get -y install git-core ntp curl"
 
 # Set RAILS_ENV
 environment=$(cat attributes/environment)
