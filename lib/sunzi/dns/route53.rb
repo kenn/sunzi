@@ -3,7 +3,7 @@ Sunzi::Dependency.load('route53')
 module Sunzi
   class DNS
     class Route53 < Base
-      def initialize(config)
+      def initialize(config, cloud)
         @api = ::Route53::Connection.new(config['route53']['key'], config['route53']['secret'])
         zone = config['fqdn']['zone']
         @route53_zone = @api.get_zones.find{|i| i.name.sub(/\.$/,'') == zone }

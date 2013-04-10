@@ -3,8 +3,8 @@ Sunzi::Dependency.load('linode')
 module Sunzi
   class DNS
     class Linode < Base
-      def initialize(config, provider)
-        @api = ::Linode.new(:api_key => (provider == 'linode') ? config['api_key'] : config['linode']['api_key'])
+      def initialize(config, cloud)
+        @api = ::Linode.new(:api_key => (cloud == 'linode') ? config['api_key'] : config['linode']['api_key'])
         zone = config['fqdn']['zone']
         @domain = @api.domain.list.find{|i| i.domain == zone }
         abort_with "zone for #{zone} was not found on Linode DNS!" unless @domain
