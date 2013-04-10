@@ -17,8 +17,7 @@ module Sunzi
           abort_with 'You must have your own settings in linode.yml'
         end
 
-        # When route53 is specified for DNS, check if it's properly configured and if not, fail earlier.
-        setup_route53 if @config['dns'] == 'route53'
+        @dns = Sunzi::DNS.new(@config) if @config['dns']
 
         @sshkey = File.read(File.expand_path(@config['root_sshkey_path'])).chomp
         if @sshkey.match(/\n/)
@@ -127,17 +126,7 @@ module Sunzi
         @private_ip = result.ipaddress
 
         # Register IP to DNS
-        case @config['dns']
-        when 'linode'
-          # Set the public IP to Linode DNS Manager
-          say "Setting the public IP to Linode DNS Manager..."
-          @domainid = @api.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
-          @api.domain.resource.create(:DomainID => @domainid, :Type => 'A', :Name => @fqdn, :Target => @public_ip)
-        when 'route53'
-          # Set the public IP to AWS Route 53
-          say "Setting the public IP to AWS Route 53..."
-          Route53::DNSRecord.new(@fqdn, "A", "300", [@public_ip], @route53_zone).create
-        end
+        @dns.add(@fqdn, @public_ip) if @dns
 
         # Save the instance info
         hash = {
@@ -174,7 +163,7 @@ module Sunzi
           abort_with "#{name}.yml was not found in the instances directory."
         end
         @config = YAML.load(File.read('linode/linode.yml'))
-        setup_route53 if @config['dns'] == 'route53'
+        @dns = Sunzi::DNS.new(@config) if @config['dns']
 
         @instance = YAML.load(File.read("linode/instances/#{name}.yml"))
         @linode_id_hash = { :LinodeID => @instance[:linode_id] }
@@ -195,29 +184,12 @@ module Sunzi
         @api.linode.delete(@linode_id_hash.merge(:skipChecks => 1))
 
         # Delete DNS record
-        case @config['dns']
-        when 'linode'
-          say 'deleting the public IP from Linode DNS Manager...'
-          @domainid = @api.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
-          @resource = @api.domain.resource.list(:DomainID => @domainid).find{|i| i.target == @instance[:public_ip] }
-          @api.domain.resource.delete(:DomainID => @domainid, :ResourceID => @resource.resourceid)
-        when 'route53'
-          say 'deleting the public IP from AWS Route 53...'
-          @record = @route53_zone.get_records.find{|i| i.values.first == @instance[:public_ip] }
-          @record.delete if @record
-        end
+        @dns.delete(@instance[:public_ip]) if @dns
 
         # Remove the instance config file
         @cli.remove_file "linode/instances/#{name}.yml"
 
         say 'Done.'
-      end
-
-      def setup_route53
-        Sunzi::Dependency.load('route53')
-        route53 = Route53::Connection.new(@config['route53']['key'], @config['route53']['secret'])
-        @route53_zone = route53.get_zones.find{|i| i.name.sub(/\.$/,'') == @config['fqdn']['zone'] }
-        abort_with "zone for #{@config['fqdn']['zone']} was not found on route53!" unless @route53_zone
       end
 
       def wait_for(action)
