@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = 'sunzi'
-  spec.version       = '1.1.0' # retrieve this value by: Gem.loaded_specs['sunzi'].version.to_s
+  spec.version       = '1.1.1' # retrieve this value by: Gem.loaded_specs['sunzi'].version.to_s
   spec.authors       = ['Kenn Ejima']
   spec.email         = ['kenn.ejima@gmail.com']
   spec.homepage      = 'http://github.com/kenn/sunzi'
