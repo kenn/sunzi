@@ -80,6 +80,13 @@ module Sunzi
           # Set the public IP to AWS Route 53
           say "Setting the public IP to AWS Route 53..."
           Route53::DNSRecord.new(@fqdn, "A", "300", [@public_ip], @route53_zone).create
+        when 'linode'
+          Sunzi::Dependency.load('linode') # FIXME: this should run at the beginning
+          linode = ::Linode.new(:api_key => @config['linode']['api_key'])
+          # Set the public IP to Linode DNS Manager
+          say "Setting the public IP to Linode DNS Manager..."
+          domainid = linode.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
+          linode.domain.resource.create(:DomainID => domainid, :Type => 'A', :Name => @fqdn, :Target => @public_ip)
         end
 
         # Save the instance info
@@ -128,6 +135,13 @@ module Sunzi
           say 'deleting the public IP from AWS Route 53...'
           @record = @route53_zone.get_records.find{|i| i.values.first == @instance[:ip_address] }
           @record.delete if @record
+        when 'linode'
+          Sunzi::Dependency.load('linode') # FIXME: this should run at the beginning
+          linode = ::Linode.new(:api_key => @config['linode']['api_key'])
+          say 'deleting the public IP from Linode DNS Manager...'
+          domainid = linode.domain.list.find{|i| i.domain == @config['fqdn']['zone'] }.domainid
+          resource = linode.domain.resource.list(:DomainID => domainid).find{|i| i.target == @instance[:ip_address] }
+          linode.domain.resource.delete(:DomainID => domainid, :ResourceID => resource.resourceid)
         end
 
         # Remove the instance config file
