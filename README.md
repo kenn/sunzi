@@ -86,8 +86,7 @@ sunzi/
   recipes/        # put commonly used scripts here, referred from install.sh
     sunzi.sh
   roles/          # when role is specified, scripts here will be concatenated
-    app.sh        # to install.sh in the compile phase
-    db.sh
+    db.sh         # to install.sh in the compile phase
     web.sh
   compiled/       # everything under this folder will be transferred to the
                   # remote server (do not edit directly)

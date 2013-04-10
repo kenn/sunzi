@@ -47,7 +47,6 @@ module Sunzi
         template 'templates/create/sunzi.yml',          "#{project}/sunzi.yml"
         template 'templates/create/install.sh',         "#{project}/install.sh"
         template 'templates/create/recipes/sunzi.sh',   "#{project}/recipes/sunzi.sh"
-        template 'templates/create/roles/app.sh',       "#{project}/roles/app.sh"
         template 'templates/create/roles/db.sh',        "#{project}/roles/db.sh"
         template 'templates/create/roles/web.sh',       "#{project}/roles/web.sh"
       end
