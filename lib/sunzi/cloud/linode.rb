@@ -9,54 +9,20 @@ module Sunzi
           abort_with "RootSSHKey #{@sshkey.inspect} must not be multi-line! Check inside \"#{@config['root_sshkey_path']}\""
         end
 
-        # Ask environment and hostname
-        @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
-        @host = ask('hostname? (only the first part of subdomain): ', String).to_s
-
-        @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
-        @label = @config['label'][@env].gsub(/%{host}/, @host)
-        @group = @config['group'][@env]
-
-        # Choose a plan
-        result = @api.avail.linodeplans
-        result.each{|i| say "#{i.planid}: #{i.ram}MB, $#{i.price}" }
-        @planid = ask('which plan?: ', Integer) {|q| q.in = result.map(&:planid); q.default = result.first.planid }
-        @plan_label = result.find{|i| i.planid == @planid }.label
-
-        # Choose a datacenter
-        result = @api.avail.datacenters
-        result.each{|i| say "#{i.datacenterid}: #{i.location}" }
-        @datacenterid = ask('which datacenter?: ', Integer) {|q| q.in = result.map(&:datacenterid); q.default = result.first.datacenterid }
-        @datacenter_location = result.find{|i| i.datacenterid == @datacenterid }.location
-
-        # Choose a distribution
-        result = @api.avail.distributions
-        if @config['distributions_filter']
-          result = result.select{|i| i.label.match Regexp.new(@config['distributions_filter'], Regexp::IGNORECASE) }
-        end
-        result.each{|i| say "#{i.distributionid}: #{i.label}" }
-        @distributionid = ask('which distribution?: ', Integer) {|q| q.in = result.map(&:distributionid); q.default = result.first.distributionid }
-        @distribution_label = result.find{|i| i.distributionid == @distributionid }.label
-
-        # Choose a kernel
-        result = @api.avail.kernels
-        if @config['kernels_filter']
-          result = result.select{|i| i.label.match Regexp.new(@config['kernels_filter'], Regexp::IGNORECASE) }
-        end
-        result.each{|i| say "#{i.kernelid}: #{i.label}" }
-        @kernelid = ask('which kernel?: ', Integer) {|q| q.in = result.map(&:kernelid); q.default = result.first.kernelid }
-        @kernel_label = result.find{|i| i.kernelid == @kernelid }.label
+        choose(:plan, @api.avail.linodeplans)
+        choose(:datacenter, @api.avail.datacenters, :label_method => :location)
+        choose(:distribution, @api.avail.distributions, :filter => 'distributions_filter')
+        choose(:kernel, @api.avail.kernels, :filter => 'kernels_filter')
 
         # Choose swap size
         @swap_size = ask('swap size in MB? (default: 256MB): ', Integer) { |q| q.default = 256 }
 
         # Go ahead?
-        moveon = ask("Are you ready to go ahead and create #{@fqdn}? (y/n) ", String) {|q| q.in = ['y','n']}
-        exit unless moveon == 'y'
+        proceed?
 
         # Create
         say "creating a new linode..."
-        result = @api.linode.create(:DatacenterID => @datacenterid, :PlanID => @planid, :PaymentTerm => @config['payment_term'])
+        result = @api.linode.create(:DatacenterID => @attributes[:datacenterid], :PlanID => @attributes[:planid], :PaymentTerm => @config['payment_term'])
         @linodeid = result.linodeid
         say "created a new instance: linodeid = #{@linodeid}"
 
@@ -65,16 +31,17 @@ module Sunzi
 
         # Update settings
         say "Updating settings..."
-        settings = { :LinodeID => @linodeid, :Label => @label, :lpm_displayGroup => @group }
+        @group = @config['group'][@env]
+        settings = { :LinodeID => @linodeid, :Label => @name, :lpm_displayGroup => @group }
         settings.update(@config['settings']) if @config['settings']
-        result = @api.linode.update(settings)
+        @api.linode.update(settings)
 
         # Create a root disk
         say "Creating a root disk..."
         result = @api.linode.disk.createfromdistribution(
           :LinodeID => @linodeid,
-          :DistributionID => @distributionid,
-          :Label => "#{@distribution_label} Image",
+          :DistributionID => @attributes[:distributionid],
+          :Label => "#{@attributes[:distribution_label]} Image",
           :Size => @totalhd - @swap_size,
           :rootPass => @config['root_pass'],
           :rootSSHKey => @sshkey
@@ -95,8 +62,8 @@ module Sunzi
         say "Creating a config profile..."
         result = @api.linode.config.create(
           :LinodeID => @linodeid,
-          :KernelID => @kernelid,
-          :Label => "#{@distribution_label} Profile",
+          :KernelID => @attributes[:kernelid],
+          :Label => "#{@attributes[:distribution_label]} Profile",
           :DiskList => [ @root_diskid, @swap_diskid ].join(',')
         )
         @config_id = result.configid
@@ -109,24 +76,20 @@ module Sunzi
         result = @api.linode.ip.list(:LinodeID => @linodeid).find{|i| i.ispublic == 0 }
         @private_ip = result.ipaddress
 
-        # Register IP to DNS
-        @dns.add(@fqdn, @public_ip) if @dns
-
-        # Save the instance info
-        hash = {
+        @instance = {
           :linode_id => @linodeid,
           :env => @env,
           :host => @host,
           :fqdn => @fqdn,
-          :label => @label,
+          :label => @name,
           :group => @group,
-          :plan_id => @planid,
-          :datacenter_id => @datacenterid,
-          :datacenter_location => @datacenter_location,
-          :distribution_id => @distributionid,
-          :distribution_label => @distribution_label,
-          :kernel_id => @kernelid,
-          :kernel_label => @kernel_label,
+          :plan_id =>             @attributes[:planid],
+          :datacenter_id =>       @attributes[:datacenterid],
+          :datacenter_location => @attributes[:datacenter_location],
+          :distribution_id =>     @attributes[:distributionid],
+          :distribution_label =>  @attributes[:distribution_label],
+          :kernel_id =>           @attributes[:kernelid],
+          :kernel_label =>        @attributes[:kernel_label],
           :swap_size => @swap_size,
           :totalhd => @totalhd,
           :root_diskid => @root_diskid,
@@ -135,11 +98,26 @@ module Sunzi
           :public_ip => @public_ip,
           :private_ip => @private_ip,
         }
-        @cli.create_file "linode/instances/#{@label}.yml", YAML.dump(hash)
 
         # Boot
         say 'Done. Booting...'
         @api.linode.boot(:LinodeID => @linodeid)
+      end
+
+      def choose(key, result, options = {})
+        label_method = options[:label_method] || :label
+        id    = :"#{key}id"
+        label = :"#{key}_#{label_method}"
+
+        # Filters
+        if options[:filter] and @config[options[:filter]]
+          result = result.select{|i| i.label.match Regexp.new(@config[options[:filter]], Regexp::IGNORECASE) }
+        end
+
+        result.each{|i| say "#{i.send(id)}: #{i.send(label_method)}" }
+        @attributes[id] = ask("which #{key}?: ", Integer) {|q| q.in = result.map(&id); q.default = result.first.send(id) }
+        @attributes[label] = result.find{|i| i.send(id) == @attributes[id] }.send(label_method)
+        p @attributes
       end
 
       def do_teardown

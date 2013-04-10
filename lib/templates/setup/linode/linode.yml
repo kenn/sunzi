@@ -14,7 +14,7 @@ fqdn:
   zone: example.com
   production: '%{host}.example.com'
   staging: '%{host}.staging.example.com'
-label:
+name:
   production: 'example-%{host}'
   staging: 'example-staging-%{host}'
 group:
