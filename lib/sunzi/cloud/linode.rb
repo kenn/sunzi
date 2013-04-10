@@ -1,24 +1,9 @@
 Sunzi::Dependency.load('linode')
 
 module Sunzi
-  module Cloud
+  class Cloud
     class Linode < Base
-      def setup
-        # Only run for the first time
-        unless File.exist? 'linode/linode.yml'
-          @cli.empty_directory 'linode/instances'
-          @cli.template 'templates/setup/linode/linode.yml', 'linode/linode.yml'
-          exit_with 'Now go ahead and edit linode.yml, then run this command again!'
-        end
-
-        @config = YAML.load(File.read('linode/linode.yml'))
-
-        if @config['fqdn']['zone'] == 'example.com'
-          abort_with 'You must have your own settings in linode.yml'
-        end
-
-        @dns = Sunzi::DNS.new(@config) if @config['dns']
-
+      def do_setup
         @sshkey = File.read(File.expand_path(@config['root_sshkey_path'])).chomp
         if @sshkey.match(/\n/)
           abort_with "RootSSHKey #{@sshkey.inspect} must not be multi-line! Check inside \"#{@config['root_sshkey_path']}\""
@@ -31,7 +16,6 @@ module Sunzi
         @fqdn = @config['fqdn'][@env].gsub(/%{host}/, @host)
         @label = @config['label'][@env].gsub(/%{host}/, @host)
         @group = @config['group'][@env]
-        @api = ::Linode.new(:api_key => @config['api_key'])
 
         # Choose a plan
         result = @api.avail.linodeplans
@@ -158,20 +142,8 @@ module Sunzi
         @api.linode.boot(:LinodeID => @linodeid)
       end
 
-      def teardown(name)
-        unless File.exist?("linode/instances/#{name}.yml")
-          abort_with "#{name}.yml was not found in the instances directory."
-        end
-        @config = YAML.load(File.read('linode/linode.yml'))
-        @dns = Sunzi::DNS.new(@config) if @config['dns']
-
-        @instance = YAML.load(File.read("linode/instances/#{name}.yml"))
+      def do_teardown
         @linode_id_hash = { :LinodeID => @instance[:linode_id] }
-        @api = ::Linode.new(:api_key => @config['api_key'])
-
-        # Are you sure?
-        moveon = ask("Are you sure about deleting #{@instance[:fqdn]} permanently? (y/n) ", String) {|q| q.in = ['y','n']}
-        exit unless moveon == 'y'
 
         # Shutdown first or disk deletion will fail
         say 'shutting down...'
@@ -182,14 +154,14 @@ module Sunzi
         # Delete the instance
         say 'deleting linode...'
         @api.linode.delete(@linode_id_hash.merge(:skipChecks => 1))
+      end
 
-        # Delete DNS record
-        @dns.delete(@instance[:public_ip]) if @dns
+      def assign_api
+        @api = ::Linode.new(:api_key => @config['api_key'])
+      end
 
-        # Remove the instance config file
-        @cli.remove_file "linode/instances/#{name}.yml"
-
-        say 'Done.'
+      def ip_key
+        :public_ip
       end
 
       def wait_for(action)

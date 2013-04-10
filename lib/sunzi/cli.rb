@@ -21,13 +21,13 @@ module Sunzi
     end
 
     desc 'setup [linode|digital_ocean]', 'Setup a new VM'
-    def setup(target)
-      Cloud::Base.choose(self, target).setup
+    def setup(provider)
+      Sunzi::Cloud.new(self, provider).setup
     end
 
     desc 'teardown [linode|digital_ocean] [name]', 'Teardown an existing VM'
-    def teardown(target, name)
-      Cloud::Base.choose(self, target).teardown(name)
+    def teardown(provider, name)
+      Sunzi::Cloud.new(self, provider).teardown(name)
     end
 
     desc 'version', 'Show version'

@@ -4,12 +4,13 @@ require 'yaml'
 
 module Sunzi
   autoload :Cli,        'sunzi/cli'
+  autoload :Cloud,      'sunzi/cloud'
   autoload :Dependency, 'sunzi/dependency'
   autoload :DNS,        'sunzi/dns'
   autoload :Logger,     'sunzi/logger'
   autoload :Utility,    'sunzi/utility'
 
-  module Cloud
+  class Cloud
     autoload :Base,         'sunzi/cloud/base'
     autoload :Linode,       'sunzi/cloud/linode'
     autoload :DigitalOcean, 'sunzi/cloud/digital_ocean'

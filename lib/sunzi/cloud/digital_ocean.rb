@@ -1,25 +1,9 @@
 Sunzi::Dependency.load('digital_ocean')
 
 module Sunzi
-  module Cloud
+  class Cloud
     class DigitalOcean < Base
-      def setup
-        unless File.exist? 'digital_ocean/digital_ocean.yml'
-          @cli.empty_directory 'digital_ocean/instances'
-          @cli.template 'templates/setup/digital_ocean/digital_ocean.yml', 'digital_ocean/digital_ocean.yml'
-          exit_with 'Now go ahead and edit digital_ocean.yml, then run this command again!'
-        end
-
-        @config = YAML.load(File.read('digital_ocean/digital_ocean.yml'))
-
-        if @config['fqdn']['zone'] == 'example.com'
-          abort_with 'You must have your own settings in digital_ocean.yml'
-        end
-
-        @dns = Sunzi::DNS.new(@config) if @config['dns']
-
-        @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
-
+      def do_setup
         # Ask environment and hostname
         @env = ask("environment? (#{@config['environments'].join(' / ')}): ", String) {|q| q.in = @config['environments'] }.to_s
         @host = ask('hostname? (only the first part of subdomain): ', String).to_s
@@ -92,37 +76,19 @@ module Sunzi
           :image_name => @image_name,
         }
         @cli.create_file "digital_ocean/instances/#{@name}.yml", YAML.dump(hash)
-
       end
 
-      def teardown(name)
-        unless File.exist?("digital_ocean/instances/#{name}.yml")
-          abort_with "#{name}.yml was not found in the instances directory."
-        end
-
-        @config = YAML.load(File.read('digital_ocean/digital_ocean.yml'))
-        @dns = Sunzi::DNS.new(@config) if @config['dns']
-
-        @instance = YAML.load(File.read("digital_ocean/instances/#{name}.yml"))
-        @droplet_id = @instance[:droplet_id]
-
-        @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
-
-        # Are you sure?
-        moveon = ask("Are you sure about deleting #{@instance[:fqdn]} permanently? (y/n) ", String) {|q| q.in = ['y','n']}
-        exit unless moveon == 'y'
-
-        # Delete the droplet
+      def do_teardown
         say 'deleting droplet...'
-        @api.droplets.delete(@droplet_id)
+        @api.droplets.delete(@instance[:droplet_id])
+      end
 
-        # Delete DNS record
-        @dns.delete(@instance[:ip_address]) if @dns
+      def assign_api
+        @api = ::DigitalOcean::API.new :api_key => @config['api_key'], :client_id => @config['client_id']
+      end
 
-        # Remove the instance config file
-        @cli.remove_file "digital_ocean/instances/#{name}.yml"
-
-        say 'Done.'
+      def ip_key
+        :ip_address
       end
     end
   end
