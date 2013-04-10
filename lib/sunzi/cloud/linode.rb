@@ -22,7 +22,10 @@ module Sunzi
 
         # Create
         say "creating a new linode..."
-        result = @api.linode.create(:DatacenterID => @attributes[:datacenterid], :PlanID => @attributes[:planid], :PaymentTerm => @config['payment_term'])
+        result = @api.linode.create(
+          :DatacenterID => @attributes[:datacenterid],
+          :PlanID => @attributes[:planid],
+          :PaymentTerm => @config['payment_term'])
         @linodeid = result.linodeid
         say "created a new instance: linodeid = #{@linodeid}"
 
@@ -117,7 +120,6 @@ module Sunzi
         result.each{|i| say "#{i.send(id)}: #{i.send(label_method)}" }
         @attributes[id] = ask("which #{key}?: ", Integer) {|q| q.in = result.map(&id); q.default = result.first.send(id) }
         @attributes[label] = result.find{|i| i.send(id) == @attributes[id] }.send(label_method)
-        p @attributes
       end
 
       def do_teardown
