@@ -14,14 +14,25 @@ module Sunzi
         gem(name, all[name][:version])
         require(all[name][:require])
       rescue LoadError
-        Logger.error <<-EOS
+        if $!.to_s =~ /Gemfile/
+          Logger.error <<-EOS
+Dependency missing: #{name}
+Add this line to your application's Gemfile.
+
+    gem '#{name}', '#{all[name][:version]}'
+
+Please try again after running "bundle install".
+          EOS
+        else
+          Logger.error <<-EOS
 Dependency missing: #{name}
 To install the gem, issue the following command:
 
     gem install #{name} -v '#{all[name][:version]}'
 
 Please try again after installing the missing dependency.
-        EOS
+          EOS
+        end
         abort
       end
     end
