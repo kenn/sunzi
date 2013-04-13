@@ -18,6 +18,7 @@ Its design goals are:
 
 ### What's new:
 
+* v1.2: Evaluate everything as ERB templates by default. Added "files" folder.
 * v1.1: "set -e" by default. apt-get everywhere in place of aptitude. Linode DNS support for DigitalOcean instances.
 * v1.0: System functions are refactored into sunzi.mute() and sunzi.install().
 * v0.9: Support for [DigitalOcean](https://www.digitalocean.com) setup / teardown.
@@ -89,25 +90,24 @@ sunzi/
   roles/          # when role is specified, scripts here will be concatenated
     db.sh         # to install.sh in the compile phase
     web.sh
+  files/          # put any files to be transferred
   compiled/       # everything under this folder will be transferred to the
                   # remote server (do not edit directly)
 ```
 
-How do you pass dynamic values to a recipe?
--------------------------------------------
+How do you pass dynamic values?
+-------------------------------
 
-In the compile phase, attributes defined in `sunzi.yml` are split into multiple files in `compiled/attributes`, one per attribute. We use filesystem as a sort of key-value storage so that it's easy to use from shell scripts.
+There are two ways to pass dynamic values to the script - ruby and bash.
 
-The convention for argument passing to a recipe is to use `$1`, `$2`, etc. and put a comment line for each argument.
+**For ruby (recommended)**: Make sure `eval_erb: true` is set in `sunzi.yml`. In the compile phase, attributes defined in `sunzi.yml` are accessible from any files in the form of `<%= @attributes.ruby_version %>`.
 
-For instance, given a recipe `greeting.sh`:
+**For bash**: In the compile phase, attributes defined in `sunzi.yml` are split into multiple files in `compiled/attributes`, one per attribute. Now you can refer to it by `$(cat attributes/ruby_version)` in the script.
+
+For instance, given the following `install.sh`:
 
 ```bash
-# Greeting
-# $1: Name for goodbye
-# $2: Name for hello
-
-echo "Goodbye $1, Hello $2!"
+echo "Goodbye <%= @attributes.goodbye %>, Hello <%= @attributes.hello %>!"
 ```
 
 With `sunzi.yml`:
@@ -118,13 +118,7 @@ attributes:
   hello: Sunzi
 ```
 
-Then, include the recipe in `install.sh`:
-
-```bash
-source recipes/greeting.sh $(cat attributes/goodbye) $(cat attributes/hello)
-```
-
-Now, you get the following result. Isn't it awesome?
+Now, you get the following result.
 
 ```
 Goodbye Chef, Hello Sunzi!

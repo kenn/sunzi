@@ -23,3 +23,7 @@ preferences:
   # Skip retrieving remote recipes when local copies already exist. This setting helps
   # iterative deploy testing considerably faster, when you have a lot of remote recipes.
   cache_remote_recipes: false
+
+  # Evaluate files as ERB templates. When enabled, you can pass dynamic values in the form
+  # of <%= @attributes.environment %> in recipes, roles, files and install.sh.
+  eval_erb: true

@@ -1,4 +1,5 @@
 require 'open3'
+require 'ostruct'
 
 module Sunzi
   class Cli < Thor
@@ -43,12 +44,13 @@ module Sunzi
       end
 
       def do_create(project)
-        template 'templates/create/.gitignore',         "#{project}/.gitignore"
-        template 'templates/create/sunzi.yml',          "#{project}/sunzi.yml"
-        template 'templates/create/install.sh',         "#{project}/install.sh"
-        template 'templates/create/recipes/sunzi.sh',   "#{project}/recipes/sunzi.sh"
-        template 'templates/create/roles/db.sh',        "#{project}/roles/db.sh"
-        template 'templates/create/roles/web.sh',       "#{project}/roles/web.sh"
+        copy_file 'templates/create/.gitignore',         "#{project}/.gitignore"
+        copy_file 'templates/create/sunzi.yml',          "#{project}/sunzi.yml"
+        copy_file 'templates/create/install.sh',         "#{project}/install.sh"
+        copy_file 'templates/create/recipes/sunzi.sh',   "#{project}/recipes/sunzi.sh"
+        copy_file 'templates/create/roles/db.sh',        "#{project}/roles/db.sh"
+        copy_file 'templates/create/roles/web.sh',       "#{project}/roles/web.sh"
+        copy_file 'templates/create/files/.gitkeep',     "#{project}/files/.gitkeep"
       end
 
       def do_deploy(target, role, force_sudo)
@@ -102,7 +104,7 @@ module Sunzi
         @config = YAML.load(File.read('sunzi.yml'))
 
         # Break down attributes into individual files
-        (@config['attributes'] || []).each {|key, value| create_file "compiled/attributes/#{key}", value }
+        (@config['attributes'] || {}).each {|key, value| create_file "compiled/attributes/#{key}", value }
 
         # Retrieve remote recipes via HTTP
         cache_remote_recipes = @config['preferences'] && @config['preferences']['cache_remote_recipes']
@@ -112,15 +114,23 @@ module Sunzi
         end
 
         # Copy local files
-        Dir['recipes/*'].each         {|file| copy_file File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
-        Dir['roles/*'].each           {|file| copy_file File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
-        (@config['files'] || []).each {|file| copy_file File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        @attributes = OpenStruct.new(@config['attributes'])
+        copy_or_template = (@config['preferences'] && @config['preferences']['eval_erb']) ? :template : :copy_file
+        Dir['recipes/*'].each {|file| send copy_or_template, File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
+        Dir['roles/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
+        Dir['files/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        (@config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
         # Build install.sh
         if role
-          create_file 'compiled/install.sh', File.binread('install.sh') << "\n" << File.binread("roles/#{role}.sh")
+          if copy_or_template == :template
+            template File.expand_path('install.sh'), 'compiled/_install.sh'
+            create_file 'compiled/install.sh', File.binread('compiled/_install.sh') << "\n" << File.binread("compiled/roles/#{role}.sh")
+          else
+            create_file 'compiled/install.sh', File.binread('install.sh') << "\n" << File.binread("roles/#{role}.sh")
+          end
         else
-          copy_file File.expand_path('install.sh'), 'compiled/install.sh'
+          send copy_or_template, File.expand_path('install.sh'), 'compiled/install.sh'
         end
       end
 

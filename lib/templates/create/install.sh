@@ -25,7 +25,7 @@ if sunzi.install "sysstat"; then
 fi
 
 # Set RAILS_ENV
-environment=$(cat attributes/environment)
+environment=<%= @attributes.environment %>
 
 if ! grep -Fq "RAILS_ENV" ~/.bash_profile; then
   echo 'Setting up RAILS_ENV...'
@@ -35,7 +35,7 @@ fi
 
 # Install Ruby using RVM
 source recipes/rvm.sh
-ruby_version=$(cat attributes/ruby_version)
+ruby_version=<%= @attributes.ruby_version %>
 
 if [[ "$(which ruby)" != /usr/local/rvm/rubies/ruby-$ruby_version* ]]; then
   echo "Installing ruby-$ruby_version"
