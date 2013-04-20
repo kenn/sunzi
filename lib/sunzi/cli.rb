@@ -36,9 +36,9 @@ module Sunzi
       puts Gem.loaded_specs['sunzi'].version.to_s
     end
 
-    desc 'recipe [ROLE] [NAME]', 'Generate a recipe'
-    def recipe(stage, name, project = 'sunzi')
-      file_name = [Time.now.strftime("%Y%m%d%H%M%S"), stage, name].join("-") + ".sh"
+    desc 'recipe [SCOPE] [NAME]', 'Generate a recipe'
+    def recipe(scope, name, project = 'sunzi')
+      file_name = [Time.now.strftime("%Y%m%d%H%M%S"), scope, name].join("-") + ".sh"
       directory = File.join(project, "recipes")
       if File.exist? directory
         file_path = File.join(directory, file_name)
