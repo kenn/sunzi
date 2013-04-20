@@ -36,6 +36,18 @@ module Sunzi
       puts Gem.loaded_specs['sunzi'].version.to_s
     end
 
+    desc 'recipe [ROLE] [NAME]', 'Generate a recipe'
+    def recipe(stage, name, project = 'sunzi')
+      file_name = [Time.now.strftime("%Y%m%d%H%M%S"), stage, name].join("-") + ".sh"
+      directory = File.join(project, "recipes")
+      if File.exist? directory
+        file_path = File.join(directory, file_name)
+        create_file file_path
+      else
+        puts "Sunzi directory structure not present. Run [create] first."
+      end
+    end
+
     no_tasks do
       include Sunzi::Utility
 
