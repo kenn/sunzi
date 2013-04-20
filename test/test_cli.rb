@@ -19,11 +19,4 @@ class TestCli < Test::Unit::TestCase
     assert File.exist?('sandbox/sunzi.yml')
     FileUtils.rm_rf 'sandbox'
   end
-
-  def test_recipe
-    @cli.create 'sandbox'
-    @cli.recipe 'foo', 'bar', 'sandbox'
-    assert !Dir['sandbox/recipes/*.sh'].select{ |file| file.end_with?("foo-bar.sh") }.empty?
-    FileUtils.rm_rf 'sandbox'
-  end
 end
