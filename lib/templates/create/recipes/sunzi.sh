@@ -60,17 +60,17 @@ function sunzi.run_recipe() {
   if [[ -f $tracker ]]; then
     echo ""
     echo "---------------------------------------------------------------------------------"
-    echo " RECIPE [$1] ALREADY RAN"
+    echo " Skipping $1"
     echo "---------------------------------------------------------------------------------"
     echo ""
   else
     echo ""
     echo "---------------------------------------------------------------------------------"
-    echo " RUNNING [$1] RECIPE"
+    echo " Running $1"
     echo "---------------------------------------------------------------------------------"
     echo ""
-    touch $tracker
     source $HOME/sunzi/recipes/$1.sh
+    touch $tracker
   fi
 }
 
