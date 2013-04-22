@@ -66,7 +66,7 @@ module Sunzi
       end
 
       def do_deploy(target, role, force_sudo)
-        sudo = 'sudo ' if force_sudo
+        sudo = 'sudo -E ' if force_sudo
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
