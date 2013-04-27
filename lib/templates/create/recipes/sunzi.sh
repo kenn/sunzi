@@ -40,11 +40,9 @@ function sunzi.install() {
   do
     if sunzi.installed "$name"; then
       echo "$name already installed"
-      return 1
     else
       echo "No packages found matching $name. Installing..."
       sunzi.mute "$sunzi_pkg -y install $name"
-      return 0
     fi
   done
 }
