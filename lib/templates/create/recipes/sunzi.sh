@@ -36,13 +36,12 @@ function sunzi.installed() {
 # otherwise the script may exit unexpectedly when the package is already installed.
 #
 function sunzi.install() {
-  for name in $@
-  do
-    if sunzi.installed "$name"; then
-      echo "$name already installed"
-    else
-      echo "No packages found matching $name. Installing..."
-      sunzi.mute "$sunzi_pkg -y install $name"
-    fi
-  done
+  if sunzi.installed "$name"; then
+    echo "$name already installed"
+    return 1
+  else
+    echo "No packages found matching $name. Installing..."
+    sunzi.mute "$sunzi_pkg -y install $name"
+    return 0
+  fi
 }
