@@ -10,11 +10,12 @@ module Sunzi
       do_create(project)
     end
 
-    desc 'provision [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
+    desc 'provision [user@host:port] [role] [--sudo]', 'Provision server with sunzi'
     method_options :sudo => false
     def provision(target, role = nil)
       do_deploy(target, role, options.sudo?)
     end
+    desc 'deploy [user@host:port] [role] [--sudo]', 'Deprecated: use provision instead'
     alias_method :deploy, :provision
 
     desc 'compile', 'Compile sunzi project'
