@@ -1,5 +1,6 @@
 require 'open3'
 require 'ostruct'
+require 'net/ssh'
 
 module Sunzi
   class Cli < Thor
@@ -136,7 +137,11 @@ module Sunzi
 
       def parse_target(target)
         target.match(/(.*@)?(.*?)(:.*)?$/)
-        [ ($1 && $1.delete('@') || 'root'), $2, ($3 && $3.delete(':') || '22') ]
+        # Load from ssh's config, if it exists.
+        config = Net::SSH::Config.for($2)
+        [ ($1 && $1.delete('@') || config[:user] || 'root'), 
+          config[:host_name] || $2, 
+          ($3 && $3.delete(':') || config[:port] && config[:port].to_s || '22') ]
       end
     end
   end
