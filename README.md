@@ -18,6 +18,7 @@ Its design goals are:
 
 ### What's new:
 
+* v1.3: SSH config support. Thanks to @toooooooby
 * v1.2: Evaluate everything as ERB templates by default. Added "files" folder.
 * v1.1: "set -e" by default. apt-get everywhere in place of aptitude. Linode DNS support for DigitalOcean instances.
 * v1.0: System functions are refactored into sunzi.mute() and sunzi.install().
