@@ -1,8 +1,7 @@
 require 'sunzi'
 require 'minitest/autorun'
-require 'test/unit'
 
-class TestCli < Test::Unit::TestCase
+class TestCli < Minitest::Test
   def setup
     @cli = Sunzi::Cli.new
   end
