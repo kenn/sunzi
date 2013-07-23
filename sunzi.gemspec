@@ -17,5 +17,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'thor'
   spec.add_runtime_dependency 'rainbow'
+  spec.add_runtime_dependency 'net-ssh'
   spec.add_development_dependency 'rake'
 end
