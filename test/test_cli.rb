@@ -1,6 +1,6 @@
 require 'sunzi'
+require 'minitest/autorun'
 require 'test/unit'
-require 'minitest/mock'
 
 class TestCli < Test::Unit::TestCase
   def setup
