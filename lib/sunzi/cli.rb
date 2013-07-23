@@ -137,7 +137,7 @@ module Sunzi
 
       def parse_target(target)
         target.match(/(.*@)?(.*?)(:.*)?$/)
-        # Load from ssh's config, if it exists.
+        # Load ssh config if it exists
         config = Net::SSH::Config.for($2)
         [ ($1 && $1.delete('@') || config[:user] || 'root'), 
           config[:host_name] || $2, 
