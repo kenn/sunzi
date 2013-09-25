@@ -45,3 +45,29 @@ function sunzi.install() {
     return 0
   fi
 }
+
+# Runs recipes while providing a simple solution to ensure idempotence.
+# Simply pass the name of the recipe without the .sh extension as the arg.
+function sunzi.run_recipe() {
+  completed_recipes_dir=/etc/sunzi/completed_recipes
+  if [[ ! -d $completed_recipes_dir ]]; then
+    mkdir -p $completed_recipes_dir
+  fi
+  tracker=$completed_recipes_dir/$1
+  if [[ -f $tracker ]]; then
+    echo ""
+    echo "---------------------------------------------------------------------------------"
+    echo " Skipping $1"
+    echo "---------------------------------------------------------------------------------"
+    echo ""
+  else
+    echo ""
+    echo "---------------------------------------------------------------------------------"
+    echo " Running $1"
+    echo "---------------------------------------------------------------------------------"
+    echo ""
+    source $HOME/sunzi/recipes/$1.sh
+    touch $tracker
+  fi
+}
+

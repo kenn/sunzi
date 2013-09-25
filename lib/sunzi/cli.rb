@@ -11,11 +11,13 @@ module Sunzi
       do_create(project)
     end
 
-    desc 'deploy [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
+    desc 'provision [user@host:port] [role] [--sudo]', 'Provision server with sunzi'
     method_options :sudo => false
-    def deploy(target, role = nil)
+    def provision(target, role = nil)
       do_deploy(target, role, options.sudo?)
     end
+    desc 'deploy [user@host:port] [role] [--sudo]', 'Deprecated: use provision instead'
+    alias_method :deploy, :provision
 
     desc 'compile', 'Compile sunzi project'
     def compile(role = nil)
@@ -37,6 +39,18 @@ module Sunzi
       puts Gem.loaded_specs['sunzi'].version.to_s
     end
 
+    desc 'recipe [NAME]', 'Generate a recipe'
+    def recipe(name, project = 'sunzi')
+      file_name = [Time.now.strftime("%Y%m%d%H%M%S"), name].join("-") + ".sh"
+      directory = File.join(project, "recipes")
+      if File.exist? directory
+        file_path = File.join(directory, file_name)
+        create_file file_path
+      else
+        puts "Sunzi directory structure not present. Run [create] first."
+      end
+    end
+
     no_tasks do
       include Sunzi::Utility
 
@@ -55,7 +69,7 @@ module Sunzi
       end
 
       def do_deploy(target, role, force_sudo)
-        sudo = 'sudo ' if force_sudo
+        sudo = 'sudo -E ' if force_sudo
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
