@@ -55,6 +55,7 @@ module Sunzi
       end
 
       def choose(key, result)
+        abort "no #{key} found!" if result.first.nil?
         result.each{|i| say "#{i.id}: #{i.name}" }
         @attributes[:"#{key}_id"] = ask("which #{key}?: ", Integer) {|q| q.in = result.map(&:id); q.default = result.first.id }
         @attributes[:"#{key}_name"] = result.find{|i| i.id == @attributes[:"#{key}_id"] }.name
