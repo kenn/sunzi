@@ -27,9 +27,9 @@ module Sunzi
       Sunzi::Cloud.new(self, provider).setup
     end
 
-    desc 'teardown [linode|digital_ocean] [name]', 'Teardown an existing VM'
-    def teardown(provider, name)
-      Sunzi::Cloud.new(self, provider).teardown(name)
+    desc 'teardown [linode|digital_ocean]', 'Teardown an existing VM'
+    def teardown(provider)
+      Sunzi::Cloud.new(self, provider).teardown
     end
 
     desc 'version', 'Show version'

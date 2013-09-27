@@ -18,15 +18,7 @@ Its design goals are:
 
 ### What's new:
 
-* v1.3: SSH config support. Thanks to @toooooooby
-* v1.2: Evaluate everything as ERB templates by default. Added "files" folder.
-* v1.1: "set -e" by default. apt-get everywhere in place of aptitude. Linode DNS support for DigitalOcean instances.
-* v1.0: System functions are refactored into sunzi.mute() and sunzi.install().
-* v0.9: Support for [DigitalOcean](https://www.digitalocean.com) setup / teardown.
-* v0.8: Added `--sudo` option to `sunzi deploy`.
-* v0.7: Added `erase_remote_folder` and `cache_remote_recipes` preferences for customized behavior.
-* v0.6: System function sunzi::silencer() added for succinct log messages.
-* v0.5: Role-based configuration supported. Reworked directory structure. **Incompatible with previous versions**.
+Please see the [CHANGELOG](https://github.com/kenn/sunzi/blob/master/CHANGELOG.md).
 
 Quickstart
 ----------
@@ -73,7 +65,7 @@ $ sunzi create                                    # Create a new Sunzi project
 $ sunzi deploy [user@host:port] [role] [--sudo]   # Deploy Sunzi project
 
 $ sunzi setup [linode|digital_ocean]              # Setup a new VM on the cloud services
-$ sunzi teardown [linode|digital_ocean] [name]    # Teardown an existing VM on the cloud services
+$ sunzi teardown [linode|digital_ocean]           # Teardown an existing VM on the cloud services
 ```
 
 Directory structure
