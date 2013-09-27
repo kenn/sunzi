@@ -7,7 +7,8 @@ attributes:
 # Remote recipes here will be downloaded to compiled/recipes.
 recipes:
   rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
-  # dotdeb: https://raw.github.com/kenn/sunzi-recipes/master/debian/dotdeb.sh
+  # dotdeb: https://raw.github.com/kenn/sunzi-recipes/master/debian/dotdeb-wheezy.sh
+  # backports: https://raw.github.com/kenn/sunzi-recipes/master/debian/backports-wheezy.sh
   # mongodb-10gen: https://raw.github.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
 
 # Files specified here will be copied to compiled/files.
@@ -18,7 +19,7 @@ recipes:
 preferences:
   # Erase the generated folder on the server after deploy.
   # Turn on when you are done with testing and ready for production use.
-  erase_remote_folder: false
+  erase_remote_folder: true
 
   # Skip retrieving remote recipes when local copies already exist. This setting helps
   # iterative deploy testing considerably faster, when you have a lot of remote recipes.

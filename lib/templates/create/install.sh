@@ -10,6 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Add Dotdeb repository. Recommended if you're using Debian. See http://www.dotdeb.org/about/
 # source recipes/dotdeb.sh
+# source recipes/backports.sh
 
 # Update apt catalog and upgrade installed packages
 sunzi.mute "apt-get update"
