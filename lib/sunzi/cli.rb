@@ -11,10 +11,10 @@ module Sunzi
       do_create(project)
     end
 
-    desc 'deploy [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
+    desc 'deploy [user@host:port] [role] [--sudo] or deploy [linode|digital_ocean] [name] [role]  [--sudo]', 'Deploy sunzi project'
     method_options :sudo => false
-    def deploy(target, role = nil)
-      do_deploy(target, role, options.sudo?)
+    def deploy(first, *args)
+      do_deploy(first, *args)
     end
 
     desc 'compile', 'Compile sunzi project'
@@ -54,8 +54,17 @@ module Sunzi
         copy_file 'templates/create/files/.gitkeep',     "#{project}/files/.gitkeep"
       end
 
-      def do_deploy(target, role, force_sudo)
-        sudo = 'sudo ' if force_sudo
+      def do_deploy(first, *args)
+        if ['linode', 'digital_ocean'].include?(first)
+          @instance_attributes = YAML.load(File.read("#{first}/instances/#{args[0]}.yml"))
+          target = @instance_attributes[:fqdn]
+          role = args[1]
+        else
+          target = first
+          role = args[0]
+        end
+
+        sudo = 'sudo ' if options.sudo?
         user, host, port = parse_target(target)
         endpoint = "#{user}@#{host}"
 
@@ -103,6 +112,10 @@ module Sunzi
 
         # Load sunzi.yml
         @config = YAML.load(File.read('sunzi.yml'))
+
+        # Merge instance attributes
+        @config['attributes'] ||= {}
+        @config['attributes'].update(Hash[@instance_attributes.map{|k,v| [k.to_s, v] }]) if @instance_attributes
 
         # Break down attributes into individual files
         (@config['attributes'] || {}).each {|key, value| create_file "compiled/attributes/#{key}", value }

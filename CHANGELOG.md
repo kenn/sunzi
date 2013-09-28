@@ -1,3 +1,6 @@
+## 1.5, release 2013-09-27
+* `sunzi deploy [linode|digital_ocean] [name]` will deploy to the instance with additional attributes.
+
 ## 1.4, release 2013-09-27
 * `sunzi teardown` no longer requires instance names as an argument, it lets you choose from a list instead.
 
