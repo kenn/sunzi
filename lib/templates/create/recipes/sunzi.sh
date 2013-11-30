@@ -55,7 +55,8 @@ function sunzi.install() {
 #     # do stuff...
 #   }
 #
-#   # will run only the function once
+#   # will only run the function once
+#   # regardless of how many times sunzi deploy is executed
 #   sunzi.run "setup_nodejs"
 #
 #   # force to run every time
