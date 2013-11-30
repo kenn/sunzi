@@ -16,6 +16,7 @@ module Sunzi
     def deploy(first, *args)
       do_deploy(first, *args)
     end
+    alias_method :provision, :deploy
 
     desc 'compile', 'Compile sunzi project'
     def compile(role = nil)
@@ -152,8 +153,8 @@ module Sunzi
         target.match(/(.*@)?(.*?)(:.*)?$/)
         # Load ssh config if it exists
         config = Net::SSH::Config.for($2)
-        [ ($1 && $1.delete('@') || config[:user] || 'root'), 
-          config[:host_name] || $2, 
+        [ ($1 && $1.delete('@') || config[:user] || 'root'),
+          config[:host_name] || $2,
           ($3 && $3.delete(':') || config[:port] && config[:port].to_s || '22') ]
       end
     end
