@@ -1,5 +1,6 @@
 require 'thor'
 require 'rainbow'
+require 'rainbow/ext/string'
 require 'yaml'
 
 module Sunzi
