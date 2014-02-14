@@ -11,15 +11,15 @@ module Sunzi
       do_create(project)
     end
 
-    desc 'deploy [user@host:port] [role] [--sudo] or deploy [linode|digital_ocean] [name] [role]  [--sudo]', 'Deploy sunzi project'
+    desc 'deploy [user@host:port] [role] [--sudo] or deploy [linode|digital_ocean] [name] [roles]  [--sudo]', 'Deploy sunzi project'
     method_options :sudo => false
     def deploy(first, *args)
       do_deploy(first, *args)
     end
 
-    desc 'compile', 'Compile sunzi project'
-    def compile(role = nil)
-      do_compile(role)
+    desc 'compile [roles]', 'Compile sunzi project'
+    def compile(*roles)
+      do_compile(roles)
     end
 
     desc 'setup [linode|digital_ocean]', 'Setup a new VM'
@@ -58,10 +58,10 @@ module Sunzi
         if ['linode', 'digital_ocean'].include?(first)
           @instance_attributes = YAML.load(File.read("#{first}/instances/#{args[0]}.yml"))
           target = @instance_attributes[:fqdn]
-          role = args[1]
+          roles = args[1, -1]
         else
           target = first
-          role = args[0]
+          roles = args
         end
 
         sudo = 'sudo ' if options.sudo?
@@ -69,7 +69,7 @@ module Sunzi
         endpoint = "#{user}@#{host}"
 
         # compile attributes and recipes
-        do_compile(role)
+        do_compile(roles)
 
         # The host key might change when we instantiate a new VM, so
         # we remove (-R) the old host key from known_hosts.
@@ -104,11 +104,13 @@ module Sunzi
         end
       end
 
-      def do_compile(role)
+      def do_compile(roles)
         # Check if you're in the sunzi directory
         abort_with 'You must be in the sunzi folder' unless File.exists?('sunzi.yml')
         # Check if role exists
-        abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
+        roles.each do |role|
+          abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
+        end
 
         # Load sunzi.yml
         @config = YAML.load(File.read('sunzi.yml'))
@@ -136,16 +138,22 @@ module Sunzi
         (@config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
         # Build install.sh
-        if role
+        if roles.any?
           if copy_or_template == :template
             template File.expand_path('install.sh'), 'compiled/_install.sh'
-            create_file 'compiled/install.sh', File.binread('compiled/_install.sh') << "\n" << File.binread("compiled/roles/#{role}.sh")
+            create_file 'compiled/install.sh', File.binread('compiled/_install.sh') << "\n" << compile_roles(roles, "compiled/roles/")
           else
-            create_file 'compiled/install.sh', File.binread('install.sh') << "\n" << File.binread("roles/#{role}.sh")
+            create_file 'compiled/install.sh', File.binread('install.sh') << "\n" << compile_roles(roles)
           end
         else
           send copy_or_template, File.expand_path('install.sh'), 'compiled/install.sh'
         end
+      end
+
+      def compile_roles(roles, location="roles/")
+        roles.map { |role|
+          File.binread("#{location}#{role}.sh")
+        }.join("\n")
       end
 
       def parse_target(target)
