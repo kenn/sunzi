@@ -58,7 +58,7 @@ module Sunzi
         if ['linode', 'digital_ocean'].include?(first)
           @instance_attributes = YAML.load(File.read("#{first}/instances/#{args[0]}.yml"))
           target = @instance_attributes[:fqdn]
-          roles = args[1, -1]
+          roles = args.drop(1)
         else
           target = first
           roles = args
