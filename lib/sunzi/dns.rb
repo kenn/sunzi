@@ -1,5 +1,7 @@
 module Sunzi
   class DNS
+    include Sunzi::Utility
+
     def initialize(config, cloud)
       dns = config['dns']
       @subject = case dns
@@ -14,6 +16,10 @@ module Sunzi
 
     def method_missing(sym, *args, &block)
       @subject.send sym, *args, &block
+    end
+
+    def respond_to?(method)
+      @subject.respond_to?(sym) || super
     end
   end
 end
