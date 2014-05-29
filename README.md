@@ -197,4 +197,4 @@ $ sunzi deploy localhost:2222
 Demonstration Videos
 -------
 
-You can watch video on how to deploy a Rails 4.1 app with Sunzi and Capistrano 3 at https://www.youtube.com/watch?v=S1iTmfnKS7Q
+You can watch video on how to deploy a Rails 4.1 app with Sunzi and Capistrano 3 at http://youtu.be/3mwupXqtkmg
