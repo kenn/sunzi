@@ -111,7 +111,12 @@ module Sunzi
         abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
 
         # Load sunzi.yml
-        @config = YAML.load(File.read('sunzi.yml'))
+        @config = YAML.load(IO.read('sunzi.yml'))
+
+        # Check if there is an environment secrets file path
+        if @config['attributes']['environment_file']
+          @config['environment'] = YAML.load(IO.read(@config['attributes']['environment_file']))
+        end
 
         # Merge instance attributes
         @config['attributes'] ||= {}
@@ -129,6 +134,7 @@ module Sunzi
 
         # Copy local files
         @attributes = OpenStruct.new(@config['attributes'])
+        @environment = OpenStruct.new(@config['environment'])
         copy_or_template = (@config['preferences'] && @config['preferences']['eval_erb']) ? :template : :copy_file
         Dir['recipes/*'].each {|file| send copy_or_template, File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
         Dir['roles/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
