@@ -111,11 +111,11 @@ module Sunzi
         abort_with "#{role} doesn't exist!" if role and !File.exists?("roles/#{role}.sh")
 
         # Load sunzi.yml
-        @config = YAML.load(IO.read('sunzi.yml'))
+        @config = YAML.load(File.read('sunzi.yml'))
 
         # Check if there is an environment secrets file path
         if @config['attributes']['environment_file']
-          @config['environment'] = YAML.load(IO.read(@config['attributes']['environment_file']))
+          @config['environment'] = YAML.load(File.read(@config['attributes']['environment_file']))
         end
 
         # Merge instance attributes
