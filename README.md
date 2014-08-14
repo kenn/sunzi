@@ -171,19 +171,11 @@ If you're using Sunzi with [Vagrant](http://vagrantup.com/), make sure that you 
 An easy way is to edit `Vagrantfile`:
 
 ```ruby
-Vagrant::Config.run do |config|
-  config.vm.provision :shell do |shell|
-    shell.path = "chpasswd.sh"
+Vagrant.configure("2") do |config|
+  config.vm.provision "shell",
+    inline: "sudo echo 'root:vagrant' | /usr/sbin/chpasswd"
   end
 end
-```
-
-with `chpasswd.sh`:
-
-```bash
-#!/bin/bash
-
-sudo echo 'root:vagrant' | /usr/sbin/chpasswd
 ```
 
 and now run `vagrant up`, it will change the root password to `vagrant`.
