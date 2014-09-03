@@ -161,6 +161,8 @@ The following screenshot says it all.
 
 Right now, only [Linode](http://www.linode.com/) and [DigitalOcean](https://www.digitalocean.com) are supported.
 
+_Note: Only v1.0 of the DigitalOcean API is supported &mdash; get your API key and client key [here](https://cloud.digitalocean.com/api_access)._
+
 For DNS, Linode and [Amazon Route 53](http://aws.amazon.com/route53/) are supported.
 
 Vagrant
