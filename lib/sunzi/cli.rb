@@ -132,7 +132,7 @@ module Sunzi
         copy_or_template = (@config['preferences'] && @config['preferences']['eval_erb']) ? :template : :copy_file
         Dir['recipes/*'].each {|file| send copy_or_template, File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
         Dir['roles/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
-        Dir['files/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        Dir['files/**/*'].select { |file| File.file?(file) }.each {|file| send copy_or_template, File.expand_path(file), "compiled/#{file}" }
         (@config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
 
         # Build install.sh
