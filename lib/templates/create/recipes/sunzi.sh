@@ -45,3 +45,23 @@ function sunzi.install() {
     return 0
   fi
 }
+
+# Copy file to location only if it's changed
+# Can be used to branch execution based on wether the file was copied or not:
+#
+# if sunzi.copy files/nginx.conf /etc/nginx/nginx.conf
+# then
+#   echo "Restarting nginx"
+#   sudo service nginx restart
+# fi
+function sunzi.copy() {
+  if diff $1 $2 > /dev/null
+  then
+    echo "$2 not changed"
+    return 1
+  else
+    echo "Updating $2"
+    sudo cp $1 $2
+    return 0
+  fi
+}
