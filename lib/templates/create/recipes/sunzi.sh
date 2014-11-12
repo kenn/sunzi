@@ -55,7 +55,7 @@ function sunzi.install() {
 #   sudo service nginx restart
 # fi
 function sunzi.copy() {
-  if diff $1 $2 > /dev/null
+  if diff $1 $2 > /dev/null 2>&1
   then
     echo "$2 not changed"
     return 1
