@@ -37,4 +37,16 @@ class TestCli < Minitest::Test
     assert File.exist?('sandbox/sunzi.yml')
     FileUtils.rm_rf 'sandbox'
   end
+
+  def test_copy_local_files
+    pwd = Dir.pwd
+    Dir.chdir('test/sunzi_test_dir')
+
+    @cli.copy_local_files({}, :copy_file)
+    assert File.exists?('compiled/files/nginx/nginx.conf')
+    assert File.exists?('compiled/recipes/nginx.sh')
+    FileUtils.rm_rf 'compiled'
+
+    Dir.chdir(pwd)
+  end
 end
