@@ -127,13 +127,8 @@ module Sunzi
           get value, "compiled/recipes/#{key}.sh"
         end
 
-        # Copy local files
-        @attributes = OpenStruct.new(@config['attributes'])
         copy_or_template = (@config['preferences'] && @config['preferences']['eval_erb']) ? :template : :copy_file
-        Dir['recipes/*'].each {|file| send copy_or_template, File.expand_path(file), "compiled/recipes/#{File.basename(file)}" }
-        Dir['roles/*'].each   {|file| send copy_or_template, File.expand_path(file), "compiled/roles/#{File.basename(file)}" }
-        Dir['files/**/*'].select { |file| File.file?(file) }.each {|file| send copy_or_template, File.expand_path(file), "compiled/#{file}" }
-        (@config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
+        copy_local_files(@config, copy_or_template)
 
         # Build install.sh
         if role
@@ -155,6 +150,14 @@ module Sunzi
         [ ($1 && $1.delete('@') || config[:user] || 'root'), 
           config[:host_name] || $2, 
           ($3 && $3.delete(':') || config[:port] && config[:port].to_s || '22') ]
+      end
+
+      def copy_local_files(config, copy_or_template)
+        @attributes = OpenStruct.new(config['attributes'])
+        files = Dir['{recipes,roles,files}/**/*'].select { |file| File.file?(file) }
+        files.each { |file| send copy_or_template, File.expand_path(file), "compiled/#{file}" }
+
+        (config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
       end
     end
   end
