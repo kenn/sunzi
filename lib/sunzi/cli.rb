@@ -155,7 +155,7 @@ module Sunzi
       def copy_local_files(config, copy_or_template)
         @attributes = OpenStruct.new(config['attributes'])
         files = Dir['{recipes,roles,files}/**/*'].select { |file| File.file?(file) }
-        files.each { |file| send copy_or_template, File.expand_path(file), "compiled/#{file}" }
+        files.each { |file| send copy_or_template, File.expand_path(file), File.expand_path("compiled/#{file}") }
 
         (config['files'] || []).each {|file| send copy_or_template, File.expand_path(file), "compiled/files/#{File.basename(file)}" }
       end
