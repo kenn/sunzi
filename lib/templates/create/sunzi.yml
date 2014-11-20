@@ -6,10 +6,10 @@ attributes:
 
 # Remote recipes here will be downloaded to compiled/recipes.
 recipes:
-  rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
-  # dotdeb: https://raw.github.com/kenn/sunzi-recipes/master/debian/dotdeb-wheezy.sh
-  # backports: https://raw.github.com/kenn/sunzi-recipes/master/debian/backports-wheezy.sh
-  # mongodb-10gen: https://raw.github.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
+  rvm: https://raw.githubusercontent.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+  # dotdeb: https://raw.githubusercontent.com/kenn/sunzi-recipes/master/debian/dotdeb-wheezy.sh
+  # backports: https://raw.githubusercontent.com/kenn/sunzi-recipes/master/debian/backports-wheezy.sh
+  # mongodb-10gen: https://raw.githubusercontent.com/kenn/sunzi-recipes/master/debian/mongodb-10gen.sh
 
 # Files specified here will be copied to compiled/files.
 # files:
