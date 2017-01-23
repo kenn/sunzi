@@ -1,5 +1,6 @@
 require 'thor'
 require 'rainbow'
+require 'rainbow/ext/string'
 require 'yaml'
 
 # Starting 2.0.0, Rainbow no longer patches string with the color method by default.
