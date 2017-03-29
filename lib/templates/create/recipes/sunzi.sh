@@ -45,3 +45,38 @@ function sunzi.install() {
     return 0
   fi
 }
+
+# Simple idempotent solution for running bash functions.
+#
+# Example:
+#
+#   function setup_nodejs() {
+#     git clone https://github.com/joyent/node.git /opt/node
+#     # do stuff...
+#   }
+#
+#   # will only run the function once
+#   # regardless of how many times sunzi deploy is executed
+#   sunzi.run "setup_nodejs"
+#
+#   # force to run every time
+#   sunzi.run "setup_nodejs" force
+#
+function sunzi.run() {
+  completed_dir=/etc/sunzi_run
+  if [ ! -d $completed_dir ]; then
+    mkdir $completed_dir
+  fi
+
+  completed_file="$completed_dir/$1"
+
+  if [ "$2" == "force" ]; then
+    rm -fv "$completed_file"
+  fi
+
+  if [ ! -f "$completed_file" ]; then
+    $1
+    touch "$completed_file"
+  fi
+}
+
