@@ -3,7 +3,10 @@ require 'sunzi/endpoint'
 
 module Sunzi
   class Command
+    include Sunzi::Utility
     include Sunzi::Worker::Delegate
+
+    delegate_to_worker :copy_file, :template, :get, :append_to_file
 
     def create(project)
       copy_file 'templates/create/.gitignore',         "#{project}/.gitignore"

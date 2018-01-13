@@ -9,18 +9,19 @@ module Sunzi
     # This interface is ugly. Instead, initialize once and reuse everywhere.
 
     include Thor::Actions
-    include Sunzi::Utility
 
     source_root Pathname.new(__FILE__).dirname.parent
-
-    no_commands do
-      # non-command methods go here
-    end
 
     module Delegate
       def self.included(base)
         base.extend Forwardable
-        base.def_delegators :'Sunzi.worker', :create_file, :copy_file, :template, :abort_with, :get, :append_to_file
+        base.extend ClassMethods
+      end
+
+      module ClassMethods
+        def delegate_to_worker(*args)
+          def_delegators :'Sunzi.worker', *args
+        end
       end
     end
   end
