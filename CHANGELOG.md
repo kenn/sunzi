@@ -1,3 +1,9 @@
+## 2.0, release 2018-01
+* Plug-in support for commands. Separate "setup" and "teardown" commands for Linode and DigitalOcean into the "sunzi-vps" gem.
+* "attributes" are now "vars" in sunzi.yml and templates.
+* ERB template e.g. <%= @vars.environment %> is now enforced.
+* Individual attribute files compiled/attributes/* are no longer supported. Use ERB template methods instead.
+
 ## 1.5, release 2013-09-27
 * `sunzi deploy [linode|digital_ocean] [name]` will deploy to the instance with additional attributes.
 

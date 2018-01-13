@@ -46,7 +46,7 @@ $ sunzi deploy example.com
 
 Now, what it actually does is:
 
-1. Compile `sunzi.yml` to generate attributes and retrieve remote recipes, then copy files into the `compiled` directory
+1. Compile `sunzi.yml` to generate variables and retrieve remote recipes, then copy files into the `compiled` directory
 1. SSH to `example.com` and login as `root`
 1. Transfer the content of the `compiled` directory to the remote server and extract in `$HOME/sunzi`
 1. Run `install.sh` on the remote server
@@ -60,12 +60,8 @@ Commands
 
 ```bash
 $ sunzi                                           # Show command help
-$ sunzi compile                                   # Compile Sunzi project
 $ sunzi create                                    # Create a new Sunzi project
 $ sunzi deploy [user@host:port] [role] [--sudo]   # Deploy Sunzi project
-
-$ sunzi setup [linode|digital_ocean]              # Setup a new VM on the cloud services
-$ sunzi teardown [linode|digital_ocean]           # Teardown an existing VM on the cloud services
 ```
 
 Directory structure
@@ -76,7 +72,7 @@ Here's the directory structure that `sunzi create` automatically generates:
 ```bash
 sunzi/
   install.sh      # main script
-  sunzi.yml       # add custom attributes and remote recipes here
+  sunzi.yml       # add custom variables and remote recipes here
 
   recipes/        # put commonly used scripts here, referred from install.sh
     sunzi.sh
@@ -84,6 +80,7 @@ sunzi/
     db.sh         # to install.sh in the compile phase
     web.sh
   files/          # put any files to be transferred
+
   compiled/       # everything under this folder will be transferred to the
                   # remote server (do not edit directly)
 ```
@@ -91,22 +88,18 @@ sunzi/
 How do you pass dynamic values?
 -------------------------------
 
-There are two ways to pass dynamic values to the script - ruby and bash.
-
-**For ruby (recommended)**: Make sure `eval_erb: true` is set in `sunzi.yml`. In the compile phase, attributes defined in `sunzi.yml` are accessible from any files in the form of `<%= @attributes.ruby_version %>`.
-
-**For bash**: In the compile phase, attributes defined in `sunzi.yml` are split into multiple files in `compiled/attributes`, one per attribute. Now you can refer to it by `$(cat attributes/ruby_version)` in the script.
+In the compile phase, variables defined in `sunzi.yml` are accessible from any files in the form of `<%= @vars.ruby_version %>`
 
 For instance, given the following `install.sh`:
 
 ```bash
-echo "Goodbye <%= @attributes.goodbye %>, Hello <%= @attributes.hello %>!"
+echo "Goodbye <%= @vars.goodbye %>, Hello <%= @vars.hello %>!"
 ```
 
 With `sunzi.yml`:
 
 ```yaml
-attributes:
+vars:
   goodbye: Chef
   hello: Sunzi
 ```
@@ -149,21 +142,6 @@ sunzi deploy example.com web
 ```
 
 It is equivalent to running `install.sh`, followed by `web.sh`.
-
-Cloud Support
--------------
-
-You can setup a new VM, or teardown an existing VM interactively. Use `sunzi setup` and `sunzi teardown` for that.
-
-The following screenshot says it all.
-
-![Sunzi for Linode](http://farm8.staticflickr.com/7210/6783789868_ab89010d5c.jpg)
-
-Right now, only [Linode](http://www.linode.com/) and [DigitalOcean](https://www.digitalocean.com) are supported.
-
-_Note: Only v1.0 of the DigitalOcean API is supported &mdash; get your API key and client key [here](https://cloud.digitalocean.com/api_access)._
-
-For DNS, Linode and [Amazon Route 53](http://aws.amazon.com/route53/) are supported.
 
 Vagrant
 -------

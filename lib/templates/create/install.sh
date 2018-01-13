@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Load base utility functions like sunzi.mute() and sunzi.install()
 source recipes/sunzi.sh
@@ -8,9 +7,14 @@ source recipes/sunzi.sh
 # Remove if you're not on Debian/Ubuntu.
 export DEBIAN_FRONTEND=noninteractive
 
-# Add Dotdeb repository. Recommended if you're using Debian. See http://www.dotdeb.org/about/
-# source recipes/dotdeb.sh
-# source recipes/backports.sh
+# Import initial SSH keys from Github
+if [ -f ~/.ssh/authorized_keys ]; then
+  echo 'authorized_keys already exists'
+else
+  mkdir -p ~/.ssh
+  wget -O - https://github.com/<%= @vars.github_username %>.keys > ~/.ssh/authorized_keys
+  chmod 600 ~/.ssh/authorized_keys
+fi
 
 # Update apt catalog and upgrade installed packages
 sunzi.mute "apt-get update"
@@ -26,7 +30,7 @@ if sunzi.install "sysstat"; then
 fi
 
 # Set RAILS_ENV
-environment=<%= @attributes.environment %>
+environment=<%= @vars.environment %>
 
 if ! grep -Fq "RAILS_ENV" ~/.bash_profile; then
   echo 'Setting up RAILS_ENV...'
@@ -34,9 +38,11 @@ if ! grep -Fq "RAILS_ENV" ~/.bash_profile; then
   source ~/.bash_profile
 fi
 
-# Install Ruby using RVM
+# Install RVM using RVM recipe
 source recipes/rvm.sh
-ruby_version=<%= @attributes.ruby_version %>
+
+# Install Ruby
+ruby_version=<%= @vars.ruby_version %>
 
 if [[ "$(which ruby)" != /usr/local/rvm/rubies/ruby-$ruby_version* ]]; then
   echo "Installing ruby-$ruby_version"

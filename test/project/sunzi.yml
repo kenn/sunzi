@@ -1,0 +1,8 @@
+---
+vars:
+  hello: world
+recipes:
+  rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+preferences:
+  erase_remote_folder: true
+  cache_remote_recipes: false
