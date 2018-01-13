@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'thor', '~> 0.20'
   spec.add_runtime_dependency 'rainbow', '~> 2.2'
-  spec.add_runtime_dependency 'net-ssh', '~> 4.2'
+  spec.add_runtime_dependency 'net-ssh', '< 5' # 4.x only supports ruby-2.0
   spec.add_runtime_dependency 'hashugar'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'minitest'
