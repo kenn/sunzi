@@ -14,7 +14,6 @@ require 'sunzi/worker'
 require 'sunzi/command'
 require 'sunzi/cli'
 require 'sunzi/dependency'
-require 'sunzi/logger'
 
 # Plug-ins
 require 'sunzi/plugin'

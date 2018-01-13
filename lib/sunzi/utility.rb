@@ -1,17 +1,11 @@
 module Sunzi
   module Utility
     def abort_with(text)
-      Logger.error text
-      abort
+      abort text.color(:red).bright
     end
 
     def exit_with(text)
-      Logger.success text
-      exit
-    end
-
-    def say(text)
-      Logger.info text
+      exit text.color(:green).bright
     end
   end
 end

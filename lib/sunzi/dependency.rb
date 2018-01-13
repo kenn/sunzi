@@ -29,8 +29,7 @@ module Sunzi
             'install'
           end
           text = ERB.new(base.join("#{which}.erb").read, nil, '-').result(binding)
-          Logger.error text
-          abort
+          abort text.color(:red).bright
         end
       end
     end
