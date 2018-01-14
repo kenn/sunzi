@@ -1,4 +1,4 @@
-## 2.0, release 2018-01
+## 2.0, release 2018-01-14
 * Plug-in support for commands.
 * Separate "setup" and "teardown" commands for VPS into the "sunzi-vps" gem as a plugin.
 * "attributes" are now "vars" in sunzi.yml and shell scripts.
