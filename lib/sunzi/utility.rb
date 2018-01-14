@@ -5,7 +5,8 @@ module Sunzi
     end
 
     def exit_with(text)
-      exit text.color(:green).bright
+      puts text.color(:green).bright
+      exit
     end
   end
 end

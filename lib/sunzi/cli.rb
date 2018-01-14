@@ -9,7 +9,7 @@ module Sunzi
     end
 
     desc 'deploy [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
-    method_options :sudo => false
+    method_options sudo: false
     def deploy(first, *args)
       Sunzi::Command.new.deploy(first, *args)
     end

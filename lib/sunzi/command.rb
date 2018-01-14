@@ -6,7 +6,7 @@ module Sunzi
     include Sunzi::Utility
     include Sunzi::Actions::Delegate
 
-    delegate_to_thor :copy_file, :template, :get, :append_to_file
+    delegate_to_thor :copy_file, :template, :get, :append_to_file, :options
 
     def create(project)
       copy_file 'templates/create/.gitignore',         "#{project}/.gitignore"
