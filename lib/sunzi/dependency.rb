@@ -29,7 +29,7 @@ module Sunzi
             'install'
           end
           text = ERB.new(base.join("#{which}.erb").read, nil, '-').result(binding)
-          abort text.color(:red).bright
+          abort_with text
         end
       end
     end
