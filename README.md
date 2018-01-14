@@ -5,16 +5,24 @@ Sunzi
 "The supreme art of war is to subdue the enemy without fighting." - Sunzi
 ```
 
-Sunzi is the easiest [server provisioning](http://en.wikipedia.org/wiki/Provisioning#Server_provisioning) utility designed for mere mortals. If Chef or Puppet is driving you nuts, try Sunzi!
+Sunzi is the easiest configuration automation and [infrastructure as code](https://en.wikipedia.org/wiki/Infrastructure_as_Code) utility designed for mere mortals.
+
+If Chef, Puppet, Ansible or SaltStack is driving you nuts, try Sunzi!
 
 Sunzi assumes that modern Linux distributions have (mostly) sane defaults and great package managers.
 
 Its design goals are:
 
 * **It's just shell script.** No clunky Ruby DSL involved. Most of the information about server configuration on the web is written in shell commands. Just copy-paste them, rather than translate it into an arbitrary DSL. Also, Bash is the greatest common denominator on minimum Linux installs.
-* **Focus on diff from default.** No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations make it difficult to understand what you are really doing.
-* **Always use the root user.** Think twice before blindly assuming you need a regular user - it doesn't add any security benefit for server provisioning, it just adds extra verbosity for nothing. However, it doesn't mean that you shouldn't create regular users with Sunzi - feel free to write your own recipes.
-* **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server.
+
+* **Minimal diff from default.** No big-bang overwriting. Append or replace the smallest possible piece of data in a config file. Loads of custom configurations make it difficult to reason what you are really doing.
+
+* **Minimum dependencies.** No configuration server required. You don't even need a Ruby runtime on the remote server, sunzi runs a combined shell script over SSH.
+
+See also:
+
+* [sunzi-vps](https://github.com/kenn/sunzi-vps) - Interactive server provisioning plugin for Linode and DigitalOcean.
+* [sunzi-recipes](https://github.com/kenn/sunzi-recipes) - Sample repository for remote recipes.
 
 ### What's new:
 
@@ -26,7 +34,7 @@ Quickstart
 Install:
 
 ```bash
-$ [sudo] gem install sunzi
+$ gem install sunzi
 ```
 
 Go into your project directory (if it's a Rails project, `config` would be a good place to start with), then:
@@ -119,7 +127,7 @@ For instance, if you have the following line in `sunzi.yml`,
 
 ```yaml
 recipes:
-  rvm: https://raw.github.com/kenn/sunzi-recipes/master/ruby/rvm.sh
+  rvm: https://raw.githubusercontent.com/kenn/sunzi-recipes/master/ruby/rvm.sh
 ```
 
 `rvm.sh` will be available and you can refer to that recipe by `source recipes/rvm.sh`.
