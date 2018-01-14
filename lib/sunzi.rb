@@ -9,9 +9,9 @@ require 'rainbow/ext/string'
 require 'thor'
 
 # Sunzi
+require 'sunzi/core_ext'
 require 'sunzi/actions'
 require 'sunzi/dependency'
-require 'sunzi/utility'
 
 require 'sunzi/cli'
 

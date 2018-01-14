@@ -1,5 +1,5 @@
 ---
-# Dynamic variables here will be compiled to individual files in compiled/vars.
+# Dynamic variables here will be accessible from shell scripts using ERB templates.
 vars:
   github_username: kenn
   environment: production

@@ -3,7 +3,6 @@ require 'sunzi/endpoint'
 
 module Sunzi
   class Command
-    include Sunzi::Utility
     include Sunzi::Actions::Delegate
 
     delegate_to_thor :copy_file, :template, :get, :append_to_file, :options
@@ -62,6 +61,7 @@ module Sunzi
 
     def compile(role = nil)
       abort_with "#{role} doesn't exist!" if role && !File.exist?("roles/#{role}.sh")
+      abort_with 'As of v2, "attributes" are now "vars" in sunzi.yml and shell scripts.' if config.attributes
 
       # Retrieve remote recipes via HTTP
       (config.recipes || []).each do |key, value|
