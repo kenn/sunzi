@@ -1,7 +1,7 @@
 require 'forwardable'
 
 module Sunzi
-  class Worker < Thor
+  class Actions < Thor
     # This class exists because thor has to be inherited AND included to import actions.
     #
     # https://github.com/erikhuda/thor/wiki/Actions
@@ -10,8 +10,9 @@ module Sunzi
 
     include Thor::Actions
 
-    source_root Pathname.new(__FILE__).dirname.parent
+    source_root Gem.loaded_specs['sunzi'].gem_dir
 
+    # include this module to use delegate_to_thor method.
     module Delegate
       def self.included(base)
         base.extend Forwardable
@@ -19,16 +20,16 @@ module Sunzi
       end
 
       module ClassMethods
-        def delegate_to_worker(*args)
-          def_delegators :'Sunzi.worker', *args
+        def delegate_to_thor(*args)
+          def_delegators :'Sunzi.thor', *args
         end
       end
     end
   end
 
   class << self
-    def worker
-      @worker ||= Sunzi::Worker.new
+    def thor
+      @thor ||= Sunzi::Actions.new
     end
   end
 end

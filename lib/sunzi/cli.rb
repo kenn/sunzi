@@ -1,3 +1,5 @@
+require 'sunzi/command'
+
 module Sunzi
   class Cli < Thor
 

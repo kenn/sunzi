@@ -5,8 +5,12 @@ module Sunzi
       # If that gem is a plugin, it will call the register method on load.
 
       def load
-        plugins = Gem::Specification.find_all.map(&:name).select{|name| name =~ /sunzi-.+/ }
-        plugins.each{|plugin| require plugin.gsub('-','/') }
+        plugins = Gem::Specification.find_all.select{|plugin| plugin.name =~ /sunzi-.+/ }
+        plugins.each do |plugin|
+          require plugin.name.gsub('-','/')
+
+          Sunzi.thor.source_paths << plugin.gem_dir
+        end
       end
     end
   end
