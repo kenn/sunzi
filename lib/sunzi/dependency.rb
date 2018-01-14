@@ -22,7 +22,7 @@ module Sunzi
           gem(name, version)
           require(name)
         rescue LoadError
-          base = Pathname.new(__FILE__).dirname.parent.join('templates/dependency')
+          base = GemRoot.join('templates/dependency')
           which = if $!.to_s =~ /Gemfile/
             'gemfile'
           else

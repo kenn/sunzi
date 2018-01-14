@@ -3,15 +3,15 @@ require 'test_helper'
 class TestCommand < Minitest::Test
   def setup
     @pwd = Dir.pwd
-    Dir.chdir GemRoot.join('test/project')
+    Dir.chdir Sunzi::GemRoot.join('test/project')
 
     @command = Sunzi::Command.new
   end
 
   def teardown
     Dir.chdir @pwd
-    FileUtils.rm_rf GemRoot.join('test/project/compiled')
-    FileUtils.rm_rf GemRoot.join('test/project/sandbox')
+    FileUtils.rm_rf Sunzi::GemRoot.join('test/project/compiled')
+    FileUtils.rm_rf Sunzi::GemRoot.join('test/project/sandbox')
   end
 
   def test_create

@@ -9,7 +9,7 @@ module Sunzi
         plugins.each do |plugin|
           require plugin.name.gsub('-','/')
 
-          Sunzi.thor.source_paths << plugin.gem_dir
+          Sunzi.thor.source_paths << Pathname.new(plugin.gem_dir)
         end
       end
     end

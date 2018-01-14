@@ -10,7 +10,7 @@ module Sunzi
 
     include Thor::Actions
 
-    source_root Gem.loaded_specs['sunzi'].gem_dir
+    source_root GemRoot
 
     # include this module to use delegate_to_thor method.
     module Delegate
