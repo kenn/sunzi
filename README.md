@@ -1,6 +1,8 @@
 Sunzi
 =====
 
+[![Build Status](https://secure.travis-ci.org/kenn/sunzi.png)](http://travis-ci.org/kenn/sunzi)
+
 ```
 "The supreme art of war is to subdue the enemy without fighting." - Sunzi
 ```
