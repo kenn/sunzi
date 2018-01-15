@@ -10,6 +10,7 @@ class TestCommand < Minitest::Test
 
   def teardown
     Dir.chdir @pwd
+
     FileUtils.rm_rf Sunzi::GemRoot.join('test/project/compiled')
     FileUtils.rm_rf Sunzi::GemRoot.join('test/project/sandbox')
   end

@@ -10,8 +10,8 @@ module Sunzi
 
     desc 'deploy [user@host:port] [role] [--sudo]', 'Deploy sunzi project'
     method_options sudo: false
-    def deploy(first, *args)
-      Sunzi::Command.new.deploy(first, *args)
+    def deploy(target, role = nil)
+      Sunzi::Command.new.deploy(target, role, options)
     end
 
     desc 'compile', 'Compile sunzi project'

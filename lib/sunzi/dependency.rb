@@ -28,7 +28,7 @@ module Sunzi
           else
             'install'
           end
-          text = ERB.new(base.join("#{which}.erb").read, nil, '-').result(binding)
+          text = ERB.new(base.join("#{which}.erb").read).result(binding)
           abort_with text
         end
       end

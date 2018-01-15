@@ -5,7 +5,7 @@ module Sunzi
   class Command
     include Sunzi::Actions::Delegate
 
-    delegate_to_thor :copy_file, :template, :get, :append_to_file, :options
+    delegate_to_thor :copy_file, :template, :get, :append_to_file
 
     def create(project)
       copy_file 'templates/create/.gitignore',         "#{project}/.gitignore"
@@ -17,14 +17,12 @@ module Sunzi
       copy_file 'templates/create/files/.gitkeep',     "#{project}/files/.gitkeep"
     end
 
-    def deploy(first, *args)
-      role = args[0]
-
-      sudo = 'sudo ' if options.sudo?
-      endpoint = Endpoint.new(first)
-
+    def deploy(target, role, options)
       # compile vars and recipes
       compile(role)
+
+      sudo = 'sudo ' if options.sudo?
+      endpoint = Endpoint.new(target)
 
       # The host key might change when we instantiate a new VM, so
       # we remove (-R) the old host key from known_hosts.
@@ -60,6 +58,7 @@ module Sunzi
     end
 
     def compile(role = nil)
+      abort_with 'You must be in a sunzi folder' unless File.exist?('sunzi.yml')
       abort_with "#{role} doesn't exist!" if role && !File.exist?("roles/#{role}.sh")
       abort_with 'As of v2, "attributes" are now "vars" in sunzi.yml and shell scripts.' if config.attributes
 
@@ -73,7 +72,7 @@ module Sunzi
       @vars = config.vars # Used within ERB templates
 
       # Copy local files to compiled folder
-      files = Dir['{recipes,roles,files}/**/*'].select { |file| File.file?(file) }
+      files = glob('{recipes,roles,files}/**/*').select { |file| File.file?(file) }
 
       files.each do |file|
         render file, "compiled/#{file}"
@@ -96,17 +95,17 @@ module Sunzi
   private
 
     def config
-      @config ||= begin
-        abort_with 'You must be in a sunzi folder' unless File.exist?('sunzi.yml')
-
-        YAML.load(File.read('sunzi.yml')).to_hashugar
-      end
+      @config ||= YAML.load(ERB.new(File.read('sunzi.yml')).result).to_hashugar
     end
 
     # template method requires absolute path to work with current directory
     #
     def render(source, target)
       template File.expand_path(source), target, context: binding
+    end
+
+    def glob(pattern)
+      Dir.glob(pattern, File::FNM_DOTMATCH) - ['.', '..']
     end
 
   end

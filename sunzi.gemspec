@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = 'sunzi'
-  spec.version       = '2.0.0' # retrieve this value by: Gem.loaded_specs['sunzi'].version.to_s
+  spec.version       = '2.1.0' # retrieve this value by: Gem.loaded_specs['sunzi'].version.to_s
   spec.authors       = ['Kenn Ejima']
   spec.email         = ['kenn.ejima@gmail.com']
   spec.summary       = %q{Server provisioning utility for minimalists}
