@@ -1,6 +1,10 @@
+## 2.1, release 2018-01-15
+* Dotfiles (files that start with '.') in recipes, roles and files are now included.
+* `sunzi.yml` is now evaluated as ERB to access environment variables. (e.g. `<%= ENV['MY_PASSWORD'] %>`)
+
 ## 2.0, release 2018-01-14
 * Plug-in support for commands.
-* Separate "setup" and "teardown" commands for VPS into the "sunzi-vps" gem as a plugin.
+* Separate `setup` and `teardown` commands for VPS into the `sunzi-vps` gem as a plugin.
 * "attributes" are now "vars" in sunzi.yml and shell scripts.
 * ERB templating (e.g. <%= @vars.environment %>) is always enabled.
 * Individual attribute files compiled/attributes/* are no longer supported. Use ERB template methods instead.
