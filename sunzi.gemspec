@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'thor', '~> 0.20'
-  spec.add_dependency 'rainbow', '~> 2.2'
+  spec.add_dependency 'rainbow', '~> 3.0'
   spec.add_dependency 'net-ssh', '< 5' # 4.x only supports ruby-2.0
   spec.add_dependency 'hashugar'
   spec.add_development_dependency 'rake'
