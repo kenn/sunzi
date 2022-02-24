@@ -164,7 +164,6 @@ An easy way is to edit `Vagrantfile`:
 Vagrant.configure("2") do |config|
   config.vm.provision "shell",
     inline: "sudo echo 'root:vagrant' | /usr/sbin/chpasswd"
-  end
 end
 ```
 
