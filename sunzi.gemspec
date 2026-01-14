@@ -20,5 +20,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'logger'
   spec.add_dependency 'hashugar'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'minitest', '~> 6.0'
+  spec.add_development_dependency 'minitest', '~> 5.0'
 end
