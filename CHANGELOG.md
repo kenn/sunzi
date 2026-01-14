@@ -1,3 +1,7 @@
+## 3.0.0, release 2026-01-14
+* Update dependencies (thor, net-ssh, minitest).
+* Replace Travis CI with GitHub Actions.
+
 ## 2.1, release 2018-01-15
 * Dotfiles (files that start with '.') in recipes, roles and files are now included.
 * `sunzi.yml` is now evaluated as ERB to access environment variables. (e.g. `<%= ENV['MY_PASSWORD'] %>`)

@@ -1,7 +1,7 @@
 Sunzi
 =====
 
-[![Build Status](https://secure.travis-ci.org/kenn/sunzi.png)](http://travis-ci.org/kenn/sunzi)
+[![Tests](https://github.com/kenn/sunzi/actions/workflows/test.yml/badge.svg)](https://github.com/kenn/sunzi/actions/workflows/test.yml)
 
 ```
 "The supreme art of war is to subdue the enemy without fighting." - Sunzi
@@ -94,6 +94,9 @@ sunzi/
   compiled/       # everything under this folder will be transferred to the
                   # remote server (do not edit directly)
 ```
+
+Security note: `sunzi.yml` is evaluated with ERB and loaded via `YAML.load`.
+Only use configs you fully trust.
 
 How do you pass dynamic values?
 -------------------------------

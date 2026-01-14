@@ -3,7 +3,7 @@
 vars:
   github_username: kenn
   environment: production
-  ruby_version: 2.5
+  ruby_version: 3.3
 
 # Remote recipes here will be downloaded to compiled/recipes.
 recipes:
