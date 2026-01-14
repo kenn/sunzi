@@ -22,12 +22,17 @@ class TestEndpoint < Minitest::Test
       end
     end
 
-    Net::SSH::Config.stub(:for, ssh_config) do
-      assert_equal ['foobar', 'buzz.example.com', '2222'],  deconstruct(Sunzi::Endpoint.new('example.com'))
-      assert_equal ['foobar', 'buzz.example.com', '8080'],  deconstruct(Sunzi::Endpoint.new('example.com:8080'))
-      assert_equal ['piyo', 'buzz.example.com', '2222'],    deconstruct(Sunzi::Endpoint.new('piyo@example.com'))
-      assert_equal ['piyo', 'buzz.example.com', '8080'],    deconstruct(Sunzi::Endpoint.new('piyo@example.com:8080'))
-      assert_equal ['root', '192.168.0.1', '22'],           deconstruct(Sunzi::Endpoint.new('192.168.0.1'))
-    end
+    Net::SSH::Config.singleton_class.alias_method :original_for, :for
+    Net::SSH::Config.define_singleton_method(:for) { |host| ssh_config.call(host) }
+
+    assert_equal ['foobar', 'buzz.example.com', '2222'],  deconstruct(Sunzi::Endpoint.new('example.com'))
+    assert_equal ['foobar', 'buzz.example.com', '8080'],  deconstruct(Sunzi::Endpoint.new('example.com:8080'))
+    assert_equal ['piyo', 'buzz.example.com', '2222'],    deconstruct(Sunzi::Endpoint.new('piyo@example.com'))
+    assert_equal ['piyo', 'buzz.example.com', '8080'],    deconstruct(Sunzi::Endpoint.new('piyo@example.com:8080'))
+    assert_equal ['root', '192.168.0.1', '22'],           deconstruct(Sunzi::Endpoint.new('192.168.0.1'))
+  ensure
+    Net::SSH::Config.singleton_class.undef_method :for
+    Net::SSH::Config.singleton_class.alias_method :for, :original_for
+    Net::SSH::Config.singleton_class.undef_method :original_for
   end
 end

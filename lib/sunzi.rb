@@ -10,7 +10,7 @@ require 'thor'
 
 # Sunzi
 module Sunzi
-  GemRoot = Pathname.new(Gem.loaded_specs['sunzi'].gem_dir)
+  GemRoot = Pathname.new(__dir__).parent
 end
 
 require 'sunzi/core_ext'
